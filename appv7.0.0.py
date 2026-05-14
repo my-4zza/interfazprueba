@@ -362,15 +362,17 @@ st.markdown("""
 .steam-menu-item:hover .steam-dropdown {
     display: block;
 }
-.steam-dropdown a {
+/* Agregamos la clase .menu-action para engañar a Streamlit */
+.steam-dropdown a, .steam-dropdown .menu-action {
     color: #b8b6b4;
     padding: 10px 15px;
     text-decoration: none;
     display: block;
     border-bottom: 1px solid rgba(255,255,255,0.03);
     transition: background 0.2s;
+    cursor: pointer;
 }
-.steam-dropdown a:hover {
+.steam-dropdown a:hover, .steam-dropdown .menu-action:hover {
     background-color: #2a475e;
     color: #ffffff;
 }
@@ -405,8 +407,8 @@ st.markdown("""
 <div class="steam-menu">
 <div class="steam-menu-item hamburguesa">&#9776;
 <div class="steam-dropdown">
-<a href="javascript:void(0)" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'es'); window.location.href = u.toString();">Español</a>
-<a href="javascript:void(0)" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'en'); window.location.href = u.toString();">English</a>
+<div class="menu-action" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'es'); window.location.href = u.toString();">Español</div>
+<div class="menu-action" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'en'); window.location.href = u.toString();">English</div>
 </div>
 </div>
 </div>
@@ -414,29 +416,29 @@ st.markdown("""
 <div class="steam-menu">
 <div class="steam-menu-item">Archivo
 <div class="steam-dropdown">
-<a href="javascript:void(0)" onclick="window.location.reload();">Recargar plataforma</a>
-<a href="javascript:void(0)" onclick="window.print();">Imprimir resultados</a>
+<div class="menu-action" onclick="window.location.reload();">Recargar plataforma</div>
+<div class="menu-action" onclick="window.print();">Imprimir resultados</div>
 </div>
 </div>
 <div class="steam-menu-item">Ver
 <div class="steam-dropdown">
-<a href="javascript:void(0)" onclick="if(!document.fullscreenElement){document.documentElement.requestFullscreen();}else{document.exitFullscreen();}">Pantalla Completa</a>
-<a href="javascript:void(0)" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) + 0.1).toString();">Zoom +</a>
-<a href="javascript:void(0)" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) - 0.1).toString();">Zoom -</a>
-<a href="javascript:void(0)" onclick="let u = new URL(window.location.href); let t = u.searchParams.get('theme') === 'dark' ? 'light' : 'dark'; u.searchParams.set('theme', t); window.location.href = u.toString();">Modo Claro / Oscuro</a>
+<div class="menu-action" onclick="if(!document.fullscreenElement){document.documentElement.requestFullscreen();}else{document.exitFullscreen();}">Pantalla Completa</div>
+<div class="menu-action" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) + 0.1).toString();">Zoom +</div>
+<div class="menu-action" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) - 0.1).toString();">Zoom -</div>
+<div class="menu-action" onclick="let u = new URL(window.location.href); let t = u.searchParams.get('theme') === 'dark' ? 'light' : 'dark'; u.searchParams.set('theme', t); window.location.href = u.toString();">Modo Claro / Oscuro</div>
 </div>
 </div>
 <div class="steam-menu-item">Ayuda
 <div class="steam-dropdown">
 <a href="https://github.com/Azavkm/Metodos-UV" target="_blank">Repositorio de GitHub</a>
-<a href="javascript:void(0)" onclick="alert('Plataforma de Análisis Numérico v6.0\\nDesarrollada para la Universidad Veracruzana.\\nMotor Matemático: Streamlit + SymPy');">Acerca de...</a>
+<div class="menu-action" onclick="alert('Plataforma de Análisis Numérico v6.0\\\\nDesarrollada para la Universidad Veracruzana.\\\\nMotor Matemático: Streamlit + SymPy');">Acerca de...</div>
 </div>
 </div>
 </div>
 <div class="steam-right">
 <div class="steam-menu-item steam-profile">Azael
 <div class="steam-dropdown" style="left: auto; right: 0;">
-<a href="javascript:void(0)" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;">Restablecer Sistema</a>
+<div class="menu-action" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;">Restablecer Sistema</div>
 </div>
 </div>
 </div>
