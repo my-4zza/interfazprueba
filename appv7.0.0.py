@@ -6,6 +6,21 @@ import plotly.graph_objects as go
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application, convert_xor
 
 # ==========================================
+# CONFIGURACIÓN DE PÁGINA (Debe ser la primera instrucción)
+# ==========================================
+st.set_page_config(page_title="MÉTODOS NUMÉRICOS", layout="wide")
+
+# ==========================================
+# GESTIÓN DE IDIOMA POR PARÁMETROS DE URL
+# ==========================================
+# Obtenemos los parámetros de la URL para gestionar el idioma y tema
+params = st.query_params
+if "lang" in params and params["lang"].lower() == "en":
+    idioma_seleccionado = "ENGLISH"
+else:
+    idioma_seleccionado = "ESPAÑOL"
+
+# ==========================================
 # DICCIONARIO DE IDIOMAS
 # ==========================================
 LANG = {
@@ -119,11 +134,11 @@ LANG = {
     }
 }
 
-# ==========================================
-# CONFIGURACIÓN DE PÁGINA Y ESTILOS CSS
-# ==========================================
-st.set_page_config(page_title="MÉTODOS NUMÉRICOS", layout="wide")
+t = LANG[idioma_seleccionado]
 
+# ==========================================
+# CONFIGURACIÓN DE ESTILOS CSS BASE
+# ==========================================
 st.markdown("""
 <style>
     /* Ajuste para que la barra personalizada no tape el contenido */
@@ -140,12 +155,12 @@ st.markdown("""
     /* Importar tipografía Samsung Sharp Sans desde CDN */
     @import url('https://fonts.cdnfonts.com/css/samsung-sharp-sans');
 
-    /* 1. Aplicar la tipografía globalmente de forma SEGURA (sin afectar iconos) */
+    /* 1. Aplicar la tipografía globalmente de forma SEGURA */
     html, body, p, h1, h2, h3, h4, h5, h6, li, label, input, button {
         font-family: 'Samsung Sharp Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
 
-    /* 2. PROTEGER ICONOS DE STREAMLIT (Corrige el bug _arrow_right) */
+    /* 2. PROTEGER ICONOS DE STREAMLIT */
     span.material-symbols-rounded, span[class*="material"], [data-testid="stIconMaterial"] {
         font-family: "Material Symbols Rounded", "Material Icons", sans-serif !important;
     }
@@ -168,12 +183,7 @@ st.markdown("""
         padding-top: 1rem !important;
     }
 
-    /* Alinear el selector de idioma a la derecha sin afectar el título */
-    div[data-testid="stRadio"] > div[role="radiogroup"] {
-        justify-content: flex-end;
-    }
-
-    /* 5. Menú de Pestañas Estilo Apple Store (Corregido contraste) */
+    /* 5. Menú de Pestañas Estilo Apple Store */
     .stTabs [data-baseweb="tab-list"] {
         display: flex;
         justify-content: center;
@@ -289,7 +299,6 @@ st.markdown("""
         background-color: #7ab3da !important;
     }
     
-    /* Asegurar que el texto dentro del summary tenga la fuente correcta sin romper el icono */
     div[data-testid="stExpander"] details summary p {
         font-family: 'Samsung Sharp Sans', -apple-system, sans-serif !important;
     }
@@ -297,7 +306,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# BARRA SUPERIOR ESTILO WINDOWS / STEAM
+# BARRA SUPERIOR ESTILO WINDOWS / STEAM FUNCIONAL
 # ==========================================
 st.markdown("""
 <style>
@@ -323,9 +332,7 @@ st.markdown("""
         color: #c7d5e0;
         margin-right: 25px;
         font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        letter-spacing: 0.5px;
     }
 
     .steam-menu {
@@ -352,7 +359,7 @@ st.markdown("""
         top: 100%;
         left: 0;
         background-color: #171d25;
-        min-width: 160px;
+        min-width: 180px;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.6);
         z-index: 1;
         border-radius: 0 0 4px 4px;
@@ -399,51 +406,70 @@ st.markdown("""
         background-color: #2a475e;
         color: #ffffff;
     }
+
+    /* Icono de hamburguesa */
+    .hamburguesa {
+        font-size: 16px;
+        font-weight: 800;
+        margin-right: 15px;
+    }
 </style>
 
 <div class="steam-top-bar">
-    <div class="steam-logo">⚙️ PLATAFORMA UV</div>
+    <div class="steam-menu">
+        <div class="steam-menu-item hamburguesa">&#9776;
+            <div class="steam-dropdown">
+                <a href="javascript:void(0)" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'es'); window.location.href = u.toString();">Español</a>
+                <a href="javascript:void(0)" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'en'); window.location.href = u.toString();">English</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="steam-logo">Universidad Veracruzana</div>
+    
     <div class="steam-menu">
         <div class="steam-menu-item">Archivo
             <div class="steam-dropdown">
-                <a href="#" onclick="window.location.reload();">Recargar plataforma</a>
-                <a href="#" onclick="window.print();">Imprimir resultados</a>
+                <a href="javascript:void(0)" onclick="window.location.reload();">Recargar plataforma</a>
+                <a href="javascript:void(0)" onclick="window.print();">Imprimir resultados</a>
             </div>
         </div>
         <div class="steam-menu-item">Ver
             <div class="steam-dropdown">
-                <a href="#" onclick="alert('Presiona la tecla F11 para activar el modo de Pantalla Completa.');">Pantalla Completa</a>
+                <a href="javascript:void(0)" onclick="if(!document.fullscreenElement){document.documentElement.requestFullscreen();}else{document.exitFullscreen();}">Pantalla Completa</a>
+                <a href="javascript:void(0)" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) + 0.1).toString();">Zoom +</a>
+                <a href="javascript:void(0)" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) - 0.1).toString();">Zoom -</a>
+                <a href="javascript:void(0)" onclick="let u = new URL(window.location.href); let t = u.searchParams.get('theme') === 'dark' ? 'light' : 'dark'; u.searchParams.set('theme', t); window.location.href = u.toString();">Modo Claro / Oscuro</a>
             </div>
         </div>
         <div class="steam-menu-item">Ayuda
             <div class="steam-dropdown">
-                <a href="https://github.com" target="_blank">Repositorio en GitHub</a>
-                <a href="#" onclick="alert('Plataforma de Análisis Numérico v6.0\\nDesarrollada para la Universidad Veracruzana.\\nMotor: Streamlit + SymPy');">Acerca de...</a>
+                <a href="https://github.com/Azavkm/Metodos-UV" target="_blank">Repositorio de GitHub</a>
+                <a href="javascript:void(0)" onclick="alert('Plataforma de Análisis Numérico v6.0\\nDesarrollada para la Universidad Veracruzana.\\nMotor Matemático: Streamlit + SymPy');">Acerca de...</a>
             </div>
         </div>
     </div>
+    
     <div class="steam-right">
-        <div class="steam-profile">oledvkm ⌄</div>
+        <div class="steam-menu-item steam-profile">Azael
+            <div class="steam-dropdown" style="left: auto; right: 0;">
+                <a href="javascript:void(0)" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;">Restablecer Sistema</a>
+            </div>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
 # ==========================================
-# ESTRUCTURA PRINCIPAL E IDIOMA
+# ESTRUCTURA PRINCIPAL
 # ==========================================
-col_idioma = st.columns([9, 1])[1]
-with col_idioma:
-    idioma_seleccionado = st.radio("", ["ESPAÑOL", "ENGLISH"], horizontal=True, label_visibility="collapsed")
-
-t = LANG[idioma_seleccionado]
-
 # Título centrado
 st.markdown(f"<h1>{t['TITLE']}</h1>", unsafe_allow_html=True)
 
-# Creación de todas las pestañas
-tab_raices, tab_regresion, tab_info, tab_ayuda, tab_ejemplos = st.tabs([
-    t["TAB1"], t["TAB2"], t["TAB_INFO"], t["TAB_HELP"], t["TAB_EXAMPLES"]
+# Creación de Pestañas Reducidas (Ayuda, Info y Ejemplos fusionadas)
+tab_raices, tab_regresion, tab_ayuda = st.tabs([
+    t["TAB1"], t["TAB2"], t["TAB_HELP"]
 ])
 
 x = sp.Symbol('x')
@@ -796,41 +822,31 @@ with tab_regresion:
     st.info(t["CONSTRUCTION"])
 
 # ==========================================
-# PESTAÑA 3: INFORMACIÓN
-# ==========================================
-with tab_info:
-    st.markdown(f"### {t['TAB_INFO']}")
-    st.markdown(t["INFO_TEXT"])
-
-# ==========================================
-# PESTAÑA 4: AYUDA
+# PESTAÑA 3: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
 # ==========================================
 with tab_ayuda:
+    st.markdown(f"### {t['TAB_INFO']}")
+    st.markdown(t["INFO_TEXT"])
+    
+    st.markdown("---")
+    
     st.markdown(f"### {t['TAB_HELP']}")
     st.markdown(t["HELP_SYNTAX"])
-    st.markdown("---")
     st.markdown(t["HELP_PARAMS"])
-
-# ==========================================
-# PESTAÑA 5: EJEMPLOS
-# ==========================================
-with tab_ejemplos:
-    st.markdown(f"### {t['TAB_EXAMPLES']}")
     
+    st.markdown("---")
+    
+    st.markdown(f"### {t['TAB_EXAMPLES']}")
     st.markdown(f"#### {t['EX_1_TITLE']}")
     st.markdown("* **$f(x)$:** `x^3 - 2x^2 - 5`")
     st.markdown("* **$x_l$ / $x_u$:** `2.0` / `3.0`")
     st.markdown("* **$x_0$:** `2.5`")
-    
-    st.markdown("---")
     
     st.markdown(f"#### {t['EX_2_TITLE']}")
     st.markdown("* **$f(x)$:** `exp(-x) - x`")
     st.markdown("* **$x_l$ / $x_u$:** `0.0` / `1.0`")
     st.markdown("* **$x_0$:** `0.0`")
 
-    st.markdown("---")
-    
     st.markdown(f"#### {t['EX_3_TITLE']}")
     st.markdown("* **$f(x)$:** `x^2 - x - 1`")
     st.markdown("* **$g(x)$:** `(x + 1)^(1/2)` o `sqrt(x + 1)`")
