@@ -1,9 +1,9 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import sympy as sp
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import time
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application, convert_xor
 
 # ==========================================
@@ -12,16 +12,41 @@ from sympy.parsing.sympy_parser import parse_expr, standard_transformations, imp
 st.set_page_config(page_title="MÉTODOS NUMÉRICOS", layout="wide")
 
 # ==========================================
-# GESTIÓN DE IDIOMA POR PARÁMETROS DE URL
+# GESTIÓN DE ACCIONES Y PARÁMETROS DE URL
 # ==========================================
+# Esto reemplaza al JavaScript. Escucha los clics de la barra superior.
 params = st.query_params
-if "lang" in params and params.get("lang", "").lower() == "en":
+
+if "action" in params:
+    action = params["action"]
+    if action == "reload":
+        del st.query_params["action"]
+        st.rerun()
+    elif action == "reset":
+        st.session_state.clear()
+        del st.query_params["action"]
+        st.rerun()
+    elif action == "tutorial":
+        st.session_state["show_tutorial"] = True
+        del st.query_params["action"]
+        st.rerun()
+    elif action == "expert":
+        st.session_state["expert_mode"] = not st.session_state.get("expert_mode", False)
+        del st.query_params["action"]
+        st.rerun()
+    elif action == "close_tut":
+        st.session_state["show_tutorial"] = False
+        del st.query_params["action"]
+        st.rerun()
+
+# Idioma
+if "lang" in params and params["lang"].lower() == "en":
     idioma_seleccionado = "ENGLISH"
 else:
     idioma_seleccionado = "ESPAÑOL"
 
 # ==========================================
-# DICCIONARIO DE IDIOMAS
+# DICCIONARIO DE IDIOMAS (LaTeX Corregido)
 # ==========================================
 LANG = {
     "ESPAÑOL": {
@@ -32,15 +57,15 @@ LANG = {
         "TAB_HELP": "AYUDA",
         "TAB_EXAMPLES": "EJEMPLOS",
         "PARAMS": "PARÁMETROS",
-        "F_MAIN": "Función principal f(x):",
-        "F_DESP": "Función despejada g(x) (Para Punto Fijo):",
+        "F_MAIN": "Función principal $f(x)$:",
+        "F_DESP": "Función despejada $g(x)$ *(Para Punto Fijo)*:",
         "WAIT_FUNC": "Esperando una función válida...",
         "SHOW_F": "MOSTRAR GRÁFICA f(x)",
         "SHOW_G": "MOSTRAR GRÁFICA g(x)",
-        "LIM_INF": "Límite inferior xl (o x_ant)",
-        "LIM_SUP": "Límite superior xu (o x_act)",
-        "PTO_INI": "Punto inicial x0",
-        "TOL": "Tolerancia",
+        "LIM_INF": "Límite inferior $x_l$ *(o $x_{ant}$)*",
+        "LIM_SUP": "Límite superior $x_u$ *(o $x_{act}$)*",
+        "PTO_INI": "Punto inicial $x_0$",
+        "TOL": "Tolerancia $\\epsilon$",
         "CALC_BTN": "CALCULAR RAÍCES",
         "RES_TITLE": "RESULTADOS E ITERACIONES",
         "COMP_GRAPH": "VER GRÁFICA COMPARATIVA DE RAÍCES",
@@ -48,12 +73,12 @@ LANG = {
         "ERR_SYNTAX": "ERROR en la sintaxis de las funciones o división por cero detectada. Revisa los datos ingresados.",
         "INFO_START": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'CALCULAR RAÍCES'.",
         "CONSTRUCTION": "MÓDULO EN CONSTRUCCIÓN.",
-        "ERR_OPPOSITE": "ERROR: f(xl) y f(xu) no tienen signos opuestos.",
+        "ERR_OPPOSITE": "ERROR: $f(x_l)$ y $f(x_u)$ no tienen signos opuestos.",
         "ERR_EVAL": "ERROR: Fallo al evaluar los límites en la función.",
         "ERR_DIV0": "ERROR: División por cero durante el cálculo.",
         "ERR_DIV0_FAIL": "ERROR: División por cero. El método falla.",
         "ERR_CONVERGE": "ERROR: El método no converge después de 100 iteraciones.",
-        "ERR_DIVERGE": "ERROR: El método diverge con este despeje o punto inicial x0.",
+        "ERR_DIVERGE": "ERROR: El método diverge con este despeje o punto inicial $x_0$.",
         "ROOT_APPROX": "Raíz Aproximada",
         "ITERS": "Iteraciones",
         "METH_BIS": "BISECCIÓN",
@@ -62,18 +87,18 @@ LANG = {
         "METH_SEC": "SECANTE",
         "METH_PF": "PUNTO FIJO",
         "COL_ITER": "Iteración",
-        "COL_XL": "x_l",
-        "COL_XU": "x_u",
-        "COL_XR": "x_r",
-        "COL_XI": "x_i",
-        "COL_XSIG": "x_i+1",
+        "COL_XL": "$x_l$",
+        "COL_XU": "$x_u$",
+        "COL_XR": "$x_r$",
+        "COL_XI": "$x_i$",
+        "COL_XSIG": "$x_{i+1}$",
         "COL_ERR": "Error Absoluto",
         "CURVE_F": "Curva f(x) y Puntos Encontrados",
         "AXIS_X": "EJE X",
         "AXIS_Y": "EJE Y",
-        "INFO_TEXT": "Esta plataforma permite encontrar las raíces de ecuaciones algebraicas y trascendentes mediante cinco métodos numéricos clásicos ejecutados de forma simultánea. El objetivo es comparar la velocidad de convergencia y la precisión de cada algoritmo para una misma función matemática.",
-        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para e^x, `log(x)` para el logaritmo natural.",
-        "HELP_PARAMS": "### PARÁMETROS\n* **xl y xu:** Requeridos para Bisección y Falsa Posición (deben encerrar la raíz).\n* **x0:** Requerido para Newton-Raphson y Punto Fijo como valor inicial de búsqueda.\n* **Tolerancia:** El criterio de detención. El cálculo se detendrá cuando el error absoluto sea menor a este valor.",
+        "INFO_TEXT": "Esta plataforma permite encontrar las raíces de ecuaciones algebraicas y trascendentes mediante cinco métodos numéricos clásicos ejecutados de forma simultánea. El objetivo es comparar la velocidad de convergencia y la precisión de cada algoritmo.",
+        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para $e^x$, `log(x)` para el logaritmo natural.",
+        "HELP_PARAMS": "### PARÁMETROS\n* **$x_l$ y $x_u$:** Requeridos para Bisección y Falsa Posición (deben encerrar la raíz).\n* **$x_0$:** Requerido para Newton-Raphson y Punto Fijo como valor inicial de búsqueda.\n* **$\\epsilon$:** El criterio de detención. El cálculo se detendrá cuando el error absoluto sea menor a este valor.",
         "EX_1_TITLE": "Ejemplo 1: Polinomio Algebraico",
         "EX_2_TITLE": "Ejemplo 2: Ecuación Trascendente",
         "EX_3_TITLE": "Ejemplo 3: Convergencia de Punto Fijo"
@@ -86,15 +111,15 @@ LANG = {
         "TAB_HELP": "HELP",
         "TAB_EXAMPLES": "EXAMPLES",
         "PARAMS": "PARAMETERS",
-        "F_MAIN": "Main function f(x):",
-        "F_DESP": "Isolated function g(x) (For Fixed Point):",
+        "F_MAIN": "Main function $f(x)$:",
+        "F_DESP": "Isolated function $g(x)$ *(For Fixed Point)*:",
         "WAIT_FUNC": "Waiting for a valid function...",
         "SHOW_F": "SHOW f(x) GRAPH",
         "SHOW_G": "SHOW g(x) GRAPH",
-        "LIM_INF": "Lower limit xl (or x_prev)",
-        "LIM_SUP": "Upper limit xu (or x_curr)",
-        "PTO_INI": "Initial point x0",
-        "TOL": "Tolerance",
+        "LIM_INF": "Lower limit $x_l$ *(or $x_{prev}$)*",
+        "LIM_SUP": "Upper limit $x_u$ *(or $x_{curr}$)*",
+        "PTO_INI": "Initial point $x_0$",
+        "TOL": "Tolerance $\\epsilon$",
         "CALC_BTN": "CALCULATE ROOTS",
         "RES_TITLE": "RESULTS & ITERATIONS",
         "COMP_GRAPH": "VIEW COMPARATIVE ROOTS GRAPH",
@@ -102,12 +127,12 @@ LANG = {
         "ERR_SYNTAX": "ERROR in function syntax or division by zero detected. Check the input data.",
         "INFO_START": "ENTER PARAMETERS ON THE LEFT AND PRESS 'CALCULATE ROOTS'.",
         "CONSTRUCTION": "MODULE UNDER CONSTRUCTION.",
-        "ERR_OPPOSITE": "ERROR: f(xl) and f(xu) do not have opposite signs.",
+        "ERR_OPPOSITE": "ERROR: $f(x_l)$ and $f(x_u)$ do not have opposite signs.",
         "ERR_EVAL": "ERROR: Failed to evaluate limits in the function.",
         "ERR_DIV0": "ERROR: Division by zero during calculation.",
         "ERR_DIV0_FAIL": "ERROR: Division by zero. Method fails.",
         "ERR_CONVERGE": "ERROR: Method does not converge after 100 iterations.",
-        "ERR_DIVERGE": "ERROR: Method diverges with this function or initial point x0.",
+        "ERR_DIVERGE": "ERROR: Method diverges with this function or initial point $x_0$.",
         "ROOT_APPROX": "Approximate Root",
         "ITERS": "Iterations",
         "METH_BIS": "BISECTION",
@@ -116,18 +141,18 @@ LANG = {
         "METH_SEC": "SECANT",
         "METH_PF": "FIXED POINT",
         "COL_ITER": "Iteration",
-        "COL_XL": "x_l",
-        "COL_XU": "x_u",
-        "COL_XR": "x_r",
-        "COL_XI": "x_i",
-        "COL_XSIG": "x_i+1",
+        "COL_XL": "$x_l$",
+        "COL_XU": "$x_u$",
+        "COL_XR": "$x_r$",
+        "COL_XI": "$x_i$",
+        "COL_XSIG": "$x_{i+1}$",
         "COL_ERR": "Absolute Error",
         "CURVE_F": "Curve f(x) and Found Points",
         "AXIS_X": "X AXIS",
         "AXIS_Y": "Y AXIS",
         "INFO_TEXT": "This platform allows finding the roots of algebraic and transcendental equations using five classic numerical methods executed simultaneously. The objective is to compare the convergence speed and precision of each algorithm for the same mathematical function.",
-        "HELP_SYNTAX": "### FUNCTION SYNTAX\nThe calculator interprets natural mathematical text. You can use:\n* **Powers:** `x^2` or `x**2`\n* **Implicit multiplication:** `2x` is automatically parsed as `2*x`\n* **Fractions:** `(x+1)/2`\n* **Trigonometric functions:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponentials and logarithms:** `exp(x)` for e^x, `log(x)` for natural logarithm.",
-        "HELP_PARAMS": "### PARAMETERS\n* **xl and xu:** Required for Bisection and False Position (must enclose the root).\n* **x0:** Required for Newton-Raphson and Fixed Point as the initial search value.\n* **Tolerance:** The stopping criterion. Calculation stops when the absolute error is less than this value.",
+        "HELP_SYNTAX": "### FUNCTION SYNTAX\nThe calculator interprets natural mathematical text. You can use:\n* **Powers:** `x^2` or `x**2`\n* **Implicit multiplication:** `2x` is automatically parsed as `2*x`\n* **Fractions:** `(x+1)/2`\n* **Trigonometric functions:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponentials and logarithms:** `exp(x)` for $e^x$, `log(x)` for natural logarithm.",
+        "HELP_PARAMS": "### PARAMETERS\n* **$x_l$ and $x_u$:** Required for Bisection and False Position (must enclose the root).\n* **$x_0$:** Required for Newton-Raphson and Fixed Point as the initial search value.\n* **$\\epsilon$:** The stopping criterion. Calculation stops when the absolute error is less than this value.",
         "EX_1_TITLE": "Example 1: Algebraic Polynomial",
         "EX_2_TITLE": "Example 2: Transcendental Equation",
         "EX_3_TITLE": "Example 3: Fixed Point Convergence"
@@ -227,7 +252,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# BARRA SUPERIOR, STEAM MENU Y TUTORIAL INYECTADO (Puro HTML estático sin onclicks)
+# BARRA SUPERIOR 100% NATIVA EN PYTHON (Sin JavaScript)
 # ==========================================
 st.markdown("""
 <style>
@@ -247,11 +272,11 @@ st.markdown("""
     border-radius: 0 0 4px 4px; overflow: hidden;
 }
 .steam-menu-item:hover .steam-dropdown { display: block; }
-.steam-dropdown a, .steam-dropdown .menu-action {
+.steam-dropdown a {
     color: #b8b6b4; padding: 10px 15px; text-decoration: none; display: block;
-    border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s;
 }
-.steam-dropdown a:hover, .steam-dropdown .menu-action:hover { background-color: #2a475e; color: #ffffff; }
+.steam-dropdown a:hover { background-color: #2a475e; color: #ffffff; }
 .steam-right { margin-left: auto; display: flex; align-items: center; }
 .steam-profile {
     color: #66c0f4; font-weight: 500; cursor: pointer; display: flex;
@@ -259,44 +284,14 @@ st.markdown("""
 }
 .steam-profile:hover { background-color: #2a475e; color: #ffffff; }
 .hamburguesa { font-size: 16px; font-weight: 800; margin-right: 15px; }
-
-/* CSS del Tutorial Toast y Modal */
-.tut-toast {
-    position: fixed; bottom: 20px; right: 20px; background: #171d25; color: white;
-    padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    display: none; flex-direction: column; gap: 12px; z-index: 999999;
-    border: 1px solid #2a475e; font-family: 'Samsung Sharp Sans', sans-serif;
-}
-.tut-buttons { display: flex; gap: 10px; justify-content: flex-end; }
-.tut-btn-yes { background: #1a73e8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;}
-.tut-btn-no { background: transparent; color: #b8b6b4; border: 1px solid #b8b6b4; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-.tut-btn-yes:hover { background: #1557b0; }
-.tut-btn-no:hover { background: #fff; color: #171d25; }
-
-.tut-modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); display: none; justify-content: center;
-    align-items: center; z-index: 1000000; backdrop-filter: blur(3px);
-}
-.tut-modal-box {
-    background: white; padding: 30px; border-radius: 12px; max-width: 450px;
-    text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-family: 'Samsung Sharp Sans', sans-serif;
-}
-.tut-modal-box h3 { color: #1a73e8; margin-top: 0; }
-.tut-modal-box p { color: #333; font-size: 15px; line-height: 1.5; margin-bottom: 25px;}
-.tut-nav-btns { display: flex; justify-content: space-between; }
-@media (prefers-color-scheme: dark) {
-    .tut-modal-box { background: #1e1e1e; }
-    .tut-modal-box p { color: #eee; }
-}
 </style>
 
 <div class="steam-top-bar">
     <div class="steam-menu">
         <div class="steam-menu-item hamburguesa">&#9776;
             <div class="steam-dropdown">
-                <a class="menu-action" href="?lang=es" target="_self">Español</a>
-                <a class="menu-action" href="?lang=en" target="_self">English</a>
+                <a href="?lang=es" target="_self">Español</a>
+                <a href="?lang=en" target="_self">English</a>
             </div>
         </div>
     </div>
@@ -304,165 +299,59 @@ st.markdown("""
     <div class="steam-menu">
         <div class="steam-menu-item">Archivo
             <div class="steam-dropdown">
-                <div class="menu-action" id="btn-reload">Recargar plataforma</div>
-                <div class="menu-action" id="btn-print">Imprimir resultados</div>
+                <a href="?action=reload" target="_self">Recargar plataforma</a>
+                <a href="?action=reset" target="_self">Borrar memoria caché</a>
             </div>
         </div>
         <div class="steam-menu-item">Ver
             <div class="steam-dropdown">
-                <div class="menu-action" id="btn-fs">Pantalla Completa</div>
-                <div class="menu-action" id="btn-zoom-in">Zoom +</div>
-                <div class="menu-action" id="btn-zoom-out">Zoom -</div>
-                <div class="menu-action" id="btn-theme">Modo Claro / Oscuro</div>
+                <a href="?theme=light" target="_self">Activar Tema Claro</a>
+                <a href="?theme=dark" target="_self">Activar Tema Oscuro</a>
             </div>
         </div>
         <div class="steam-menu-item">Ayuda
             <div class="steam-dropdown">
                 <a href="https://github.com/Azavkm/Metodos-UV" target="_blank">Repositorio de GitHub</a>
-                <div class="menu-action" id="btn-tutorial">Ver Tutorial Interactivo</div>
-                <div class="menu-action" id="btn-about">Acerca de...</div>
+                <a href="?action=tutorial" target="_self">Ver Guía de Inicio Rápido</a>
             </div>
         </div>
     </div>
     <div class="steam-right">
         <div class="steam-menu-item steam-profile">Azael
             <div class="steam-dropdown" style="left: auto; right: 0;">
-                <div class="menu-action" id="btn-reset">Restablecer Sistema</div>
+                <a href="?action=expert" target="_self">Activar/Desactivar Modo Experto</a>
             </div>
-        </div>
-    </div>
-</div>
-
-<div id="tut-toast" class="tut-toast">
-    <div style="font-weight: bold; font-size: 14px;">👋 ¿Eres nuevo por aquí?</div>
-    <div style="font-size: 13px; color: #c7d5e0;">Aprende a calcular raíces paso a paso con nuestra guía rápida.</div>
-    <div class="tut-buttons">
-        <button class="tut-btn-no" id="tut-btn-skip">Omitir</button>
-        <button class="tut-btn-yes" id="tut-btn-start">Comenzar Guía</button>
-    </div>
-</div>
-
-<div id="tut-modal" class="tut-modal-overlay">
-    <div class="tut-modal-box">
-        <h3 id="tut-title">Título</h3>
-        <p id="tut-text">Texto del paso actual.</p>
-        <div class="tut-nav-btns">
-            <button class="tut-btn-no" id="tut-btn-prev">Anterior</button>
-            <button class="tut-btn-yes" id="tut-btn-next">Siguiente</button>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# EL "MOTOR INVISIBLE": JAVASCRIPT SEGURO
+# NOTIFICACIÓN Y GUÍA DE INICIO (Nativo)
 # ==========================================
-js_code = """
-<script>
-    // Este script corre en un iframe seguro pero controla la página principal
-    const doc = window.parent.document;
-    const win = window.parent;
+if "tutorial_seen" not in st.session_state:
+    st.toast('👋 ¡Hola! Si eres nuevo, ve al menú **Ayuda > Ver Guía de Inicio Rápido** para aprender a usar la plataforma.', icon='🎓')
+    st.session_state["tutorial_seen"] = True
 
-    // Función auxiliar para asignar clics con seguridad
-    function addClick(id, action) {
-        const el = doc.getElementById(id);
-        if(el) { el.onclick = action; }
-    }
-
-    // LÓGICA DE LA BARRA SUPERIOR
-    addClick('btn-reload', () => win.location.reload());
-    addClick('btn-print', () => win.print());
-    addClick('btn-fs', () => {
-        if(!doc.fullscreenElement) { doc.documentElement.requestFullscreen(); }
-        else { doc.exitFullscreen(); }
-    });
-    addClick('btn-zoom-in', () => {
-        let currentZoom = parseFloat(doc.body.style.zoom || 1);
-        doc.body.style.zoom = (currentZoom + 0.1).toString();
-    });
-    addClick('btn-zoom-out', () => {
-        let currentZoom = parseFloat(doc.body.style.zoom || 1);
-        doc.body.style.zoom = (currentZoom - 0.1).toString();
-    });
-    addClick('btn-theme', () => {
-        let u = new URL(win.location.href);
-        let t = u.searchParams.get('theme') === 'dark' ? 'light' : 'dark';
-        u.searchParams.set('theme', t);
-        win.location.href = u.toString();
-    });
-    addClick('btn-about', () => {
-        win.alert('Plataforma de Análisis Numérico v6.0\\nDesarrollada para la Universidad Veracruzana.\\nMotor Matemático: Streamlit + SymPy');
-    });
-    addClick('btn-reset', () => {
-        win.localStorage.clear(); win.sessionStorage.clear();
-        win.location.href = win.location.pathname;
-    });
-
-    // LÓGICA DEL TUTORIAL
-    const pasosTutorial = [
-        {title: "¡Bienvenido a la Plataforma!", text: "Esta herramienta resuelve ecuaciones utilizando 5 métodos numéricos simultáneos. Ideal para comparar su eficiencia en tiempo real."},
-        {title: "1. Ingresa tu Función", text: "En el panel izquierdo, escribe tu función f(x) usando lenguaje matemático natural. Ej: 'x^2 - 4' o 'sin(x)'. Puedes previsualizar su gráfica al instante."},
-        {title: "2. Define los Parámetros", text: "Ajusta los límites inferior (xl) y superior (xu) para los métodos cerrados, y el punto inicial (x0) para los abiertos. No olvides fijar tu tolerancia."},
-        {title: "3. Calcula las Raíces", text: "Haz clic en el botón azul 'CALCULAR RAÍCES'. El motor procesará todos los algoritmos a la vez."},
-        {title: "4. Analiza los Resultados", text: "A la derecha verás una gráfica comparativa con las raíces encontradas por cada método. Expande cada caja para ver la tabla iterativa completa."},
-        {title: "¡Todo Listo!", text: "Recuerda que puedes usar el menú superior para pantalla completa o imprimir reportes. ¡Éxito en tus cálculos!"}
-    ];
-    let pasoActual = 0;
-
-    function actualizarModal() {
-        doc.getElementById('tut-title').innerText = pasosTutorial[pasoActual].title;
-        doc.getElementById('tut-text').innerText = pasosTutorial[pasoActual].text;
-        doc.getElementById('tut-btn-prev').style.visibility = pasoActual === 0 ? 'hidden' : 'visible';
-        doc.getElementById('tut-btn-next').innerText = pasoActual === pasosTutorial.length - 1 ? 'Finalizar' : 'Siguiente';
-    }
-
-    addClick('tut-btn-skip', () => {
-        doc.getElementById('tut-toast').style.display = 'none';
-        win.sessionStorage.setItem('tutorialVisto', 'true');
-    });
-
-    addClick('tut-btn-start', () => {
-        doc.getElementById('tut-toast').style.display = 'none';
-        win.sessionStorage.setItem('tutorialVisto', 'true');
-        pasoActual = 0;
-        doc.getElementById('tut-modal').style.display = 'flex';
-        actualizarModal();
-    });
-
-    addClick('btn-tutorial', () => {
-        pasoActual = 0;
-        doc.getElementById('tut-modal').style.display = 'flex';
-        actualizarModal();
-    });
-
-    addClick('tut-btn-prev', () => {
-        if(pasoActual > 0) { pasoActual--; actualizarModal(); }
-    });
-
-    addClick('tut-btn-next', () => {
-        if(pasoActual < pasosTutorial.length - 1) {
-            pasoActual++; actualizarModal();
-        } else {
-            doc.getElementById('tut-modal').style.display = 'none';
-        }
-    });
-
-    // Mostrar el toast si no se ha visto en la sesión actual
-    setTimeout(() => {
-        if(!win.sessionStorage.getItem('tutorialVisto')) {
-            const toast = doc.getElementById('tut-toast');
-            if(toast) toast.style.display = 'flex';
-        }
-    }, 1000);
-</script>
-"""
-components.html(js_code, height=0, width=0)
+if st.session_state.get("show_tutorial", False):
+    st.success("""
+    ### 🎓 Guía de Inicio Rápido
+    1. **Ingresa tu Función:** A la izquierda, escribe tu función usando lenguaje natural (Ej: `x^2 - 4` o `sin(x)`).
+    2. **Define Parámetros:** Ajusta los límites ($x_l$, $x_u$) y el punto inicial ($x_0$). Fija tu tolerancia.
+    3. **Calcula:** Haz clic en 'CALCULAR RAÍCES'. El motor procesará los 5 algoritmos a la vez.
+    4. **Analiza:** Observa la gráfica comparativa y abre cada pestaña para ver la tabla iterativa.
+    
+    *(Para cerrar esta guía, usa la X en la esquina superior derecha de este cuadro)*
+    """)
 
 # ==========================================
-# ESTRUCTURA PRINCIPAL DE STREAMLIT
+# ESTRUCTURA PRINCIPAL
 # ==========================================
 # Título centrado
 st.markdown(f"<h1>{t['TITLE']}</h1>", unsafe_allow_html=True)
+
+if st.session_state.get("expert_mode", False):
+    st.caption("⚙️ **MODO EXPERTO ACTIVADO:** Monitor de rendimiento en segundo plano listo.")
 
 # Creación de Pestañas Reducidas (Ayuda, Info y Ejemplos fusionadas)
 tab_raices, tab_regresion, tab_ayuda = st.tabs([
@@ -476,7 +365,7 @@ transformations = (standard_transformations + (implicit_multiplication_applicati
 # FUNCIÓN PARA GENERAR GRÁFICAS
 # ==========================================
 def crear_grafica(func_lambdificada, titulo, raices_encontradas=None):
-    x_vals = np.linspace(-100, 100, 4000)
+    x_vals = np.linspace(-10, 10, 1000)
     y_vals = np.zeros_like(x_vals)
     
     for i, val in enumerate(x_vals):
@@ -503,13 +392,13 @@ def crear_grafica(func_lambdificada, titulo, raices_encontradas=None):
         showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', 
         minor=dict(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.08)'),
         zeroline=True, zerolinewidth=2, zerolinecolor='rgba(128,128,128,0.5)',
-        range=[-10, 10], tickformat="g"
+        tickformat="g"
     )
     fig.update_yaxes(
         showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', 
         minor=dict(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.08)'),
         zeroline=True, zerolinewidth=2, zerolinecolor='rgba(128,128,128,0.5)',
-        range=[-10, 10], tickformat="g"
+        tickformat="g"
     )
 
     if raices_encontradas:
@@ -765,6 +654,7 @@ with tab_raices:
     with col_results:
         st.markdown(f"### {t['RES_TITLE']}")
         if ejecutar:
+            start_time = time.time()
             try:
                 f_expr = parse_expr(f_str, transformations=transformations)
                 f = sp.lambdify(x, f_expr, 'math')
@@ -805,6 +695,9 @@ with tab_raices:
                             st.dataframe(pd.DataFrame(historial), use_container_width=True, hide_index=True)
                         else:
                             st.error(historial[0]["Mensaje"])
+                
+                if st.session_state.get("expert_mode", False):
+                    st.success(f"⏱️ Tiempo total de procesamiento SymPy: {(time.time() - start_time):.4f} segundos.")
 
             except Exception as e:
                 st.error(t["ERR_SYNTAX"])
@@ -835,17 +728,17 @@ with tab_ayuda:
     
     st.markdown(f"### {t['TAB_EXAMPLES']}")
     st.markdown(f"#### {t['EX_1_TITLE']}")
-    st.markdown("* **f(x):** `x^3 - 2x^2 - 5`")
-    st.markdown("* **xl / xu:** `2.0` / `3.0`")
-    st.markdown("* **x0:** `2.5`")
+    st.markdown("* **$f(x)$:** `x^3 - 2x^2 - 5`")
+    st.markdown("* **$x_l$ / $x_u$:** `2.0` / `3.0`")
+    st.markdown("* **$x_0$:** `2.5`")
     
     st.markdown(f"#### {t['EX_2_TITLE']}")
-    st.markdown("* **f(x):** `exp(-x) - x`")
-    st.markdown("* **xl / xu:** `0.0` / `1.0`")
-    st.markdown("* **x0:** `0.0`")
+    st.markdown("* **$f(x)$:** `exp(-x) - x`")
+    st.markdown("* **$x_l$ / $x_u$:** `0.0` / `1.0`")
+    st.markdown("* **$x_0$:** `0.0`")
 
     st.markdown(f"#### {t['EX_3_TITLE']}")
-    st.markdown("* **f(x):** `x^2 - x - 1`")
-    st.markdown("* **g(x):** `(x + 1)^(1/2)` o `sqrt(x + 1)`")
-    st.markdown("* **xl / xu:** `1.0` / `2.0`")
-    st.markdown("* **x0:** `1.0`")
+    st.markdown("* **$f(x)$:** `x^2 - x - 1`")
+    st.markdown("* **$g(x)$:** `(x + 1)^(1/2)` o `sqrt(x + 1)`")
+    st.markdown("* **$x_l$ / $x_u$:** `1.0` / `2.0`")
+    st.markdown("* **$x_0$:** `1.0`")
