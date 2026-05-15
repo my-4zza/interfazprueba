@@ -146,7 +146,7 @@ st.markdown("""
         padding-bottom: 1rem !important;
     }
 
-    /* Ocultar la barra superior invisible de Streamlit (Botón Deploy y Menú) */
+    /* Ocultar la barra superior invisible de Streamlit */
     [data-testid="stHeader"] {
         display: none !important;
     }
@@ -154,27 +154,22 @@ st.markdown("""
     /* Importar tipografía Samsung Sharp Sans desde CDN */
     @import url('https://fonts.cdnfonts.com/css/samsung-sharp-sans');
 
-    /* 1. Aplicar la tipografía globalmente de forma SEGURA */
     html, body, p, h1, h2, h3, h4, h5, h6, li, label, input, button {
         font-family: 'Samsung Sharp Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
 
-    /* 2. PROTEGER ICONOS DE STREAMLIT */
     span.material-symbols-rounded, span[class*="material"], [data-testid="stIconMaterial"] {
         font-family: "Material Symbols Rounded", "Material Icons", sans-serif !important;
     }
 
-    /* 3. PROTEGER LAS MATEMÁTICAS (LaTeX / KaTeX) */
     .katex, .katex *, .katex-display * {
         font-family: KaTeX_Math, 'KaTeX_Main', serif !important;
     }
 
-    /* Ocultar enlace ancla en los títulos */
     .stMarkdown h1 a, .stMarkdown h2 a, .stMarkdown h3 a {
         display: none !important;
     }
 
-    /* 4. Estructura de Cabecera Centrada */
     h1 {
         text-align: center !important;
         font-weight: 700 !important;
@@ -182,7 +177,6 @@ st.markdown("""
         padding-top: 1rem !important;
     }
 
-    /* 5. Menú de Pestañas Estilo Apple Store */
     .stTabs [data-baseweb="tab-list"] {
         display: flex;
         justify-content: center;
@@ -202,7 +196,6 @@ st.markdown("""
         font-size: 0.85rem !important;
         color: #424245 !important;
         letter-spacing: 0.5px;
-        font-family: 'Samsung Sharp Sans', -apple-system, sans-serif !important;
     }
 
     .stTabs [data-baseweb="tab"]:hover {
@@ -215,7 +208,6 @@ st.markdown("""
         font-weight: 700 !important;
     }
 
-    /* Soporte Modo Oscuro para Pestañas */
     @media (prefers-color-scheme: dark) {
         .stTabs [data-baseweb="tab"] { color: #a1a1a6 !important; }
         .stTabs [data-baseweb="tab"]:hover { color: #ffffff !important; }
@@ -225,7 +217,6 @@ st.markdown("""
         }
     }
     
-    /* 6. Inputs de texto y botones */
     div[data-testid="stTextInput"] input {
         border-radius: 10px !important;
         transition: all 0.3s ease;
@@ -287,7 +278,6 @@ st.markdown("""
         justify-content: center;
     }
 
-    /* 7. Botones desplegables azul claro */
     div[data-testid="stExpander"] details summary {
         background-color: #88C7F2 !important;
         color: #000000 !important;
@@ -297,7 +287,6 @@ st.markdown("""
     div[data-testid="stExpander"] details summary:hover {
         background-color: #7ab3da !important;
     }
-    
     div[data-testid="stExpander"] details summary p {
         font-family: 'Samsung Sharp Sans', -apple-system, sans-serif !important;
     }
@@ -305,144 +294,195 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# BARRA SUPERIOR ESTILO WINDOWS / STEAM FUNCIONAL
+# BARRA SUPERIOR, STEAM MENU Y TUTORIAL INYECTADO
 # ==========================================
 st.markdown("""
 <style>
+/* CSS de la Barra Superior */
 .steam-top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 40px;
-    background-color: #171d25;
-    color: #b8b6b4;
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    z-index: 999999;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    position: fixed; top: 0; left: 0; width: 100%; height: 40px;
+    background-color: #171d25; color: #b8b6b4; display: flex; align-items: center;
+    padding: 0 15px; z-index: 999999; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px; box-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
-.steam-logo {
-    font-weight: 700;
-    color: #c7d5e0;
-    margin-right: 25px;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-}
-.steam-menu {
-    display: flex;
-    gap: 5px;
-}
-.steam-menu-item {
-    cursor: pointer;
-    padding: 5px 12px;
-    border-radius: 3px;
-    position: relative;
-    transition: background 0.2s, color 0.2s;
-}
-.steam-menu-item:hover {
-    background-color: #2a475e;
-    color: #ffffff;
-}
+.steam-logo { font-weight: 700; color: #c7d5e0; margin-right: 25px; font-size: 14px; letter-spacing: 0.5px; }
+.steam-menu { display: flex; gap: 5px; }
+.steam-menu-item { cursor: pointer; padding: 5px 12px; border-radius: 3px; position: relative; transition: background 0.2s, color 0.2s; }
+.steam-menu-item:hover { background-color: #2a475e; color: #ffffff; }
 .steam-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: #171d25;
-    min-width: 180px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.6);
-    z-index: 1;
-    border-radius: 0 0 4px 4px;
-    overflow: hidden;
+    display: none; position: absolute; top: 100%; left: 0; background-color: #171d25;
+    min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.6); z-index: 1;
+    border-radius: 0 0 4px 4px; overflow: hidden;
 }
-.steam-menu-item:hover .steam-dropdown {
-    display: block;
-}
-/* Agregamos la clase .menu-action para engañar a Streamlit */
+.steam-menu-item:hover .steam-dropdown { display: block; }
 .steam-dropdown a, .steam-dropdown .menu-action {
-    color: #b8b6b4;
-    padding: 10px 15px;
-    text-decoration: none;
-    display: block;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    transition: background 0.2s;
-    cursor: pointer;
+    color: #b8b6b4; padding: 10px 15px; text-decoration: none; display: block;
+    border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s; cursor: pointer;
 }
-.steam-dropdown a:hover, .steam-dropdown .menu-action:hover {
-    background-color: #2a475e;
-    color: #ffffff;
-}
-.steam-right {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-}
+.steam-dropdown a:hover, .steam-dropdown .menu-action:hover { background-color: #2a475e; color: #ffffff; }
+.steam-right { margin-left: auto; display: flex; align-items: center; }
 .steam-profile {
-    color: #66c0f4;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 3px;
-    transition: background 0.2s;
+    color: #66c0f4; font-weight: 500; cursor: pointer; display: flex;
+    align-items: center; gap: 5px; padding: 5px 10px; border-radius: 3px; transition: background 0.2s;
 }
-.steam-profile:hover {
-    background-color: #2a475e;
-    color: #ffffff;
+.steam-profile:hover { background-color: #2a475e; color: #ffffff; }
+.hamburguesa { font-size: 16px; font-weight: 800; margin-right: 15px; }
+
+/* CSS del Tutorial Toast y Modal */
+.tut-toast {
+    position: fixed; bottom: 20px; right: 20px; background: #171d25; color: white;
+    padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    display: none; flex-direction: column; gap: 12px; z-index: 999999;
+    border: 1px solid #2a475e; font-family: 'Samsung Sharp Sans', sans-serif;
 }
-.hamburguesa {
-    font-size: 16px;
-    font-weight: 800;
-    margin-right: 15px;
+.tut-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+.tut-btn-yes { background: #1a73e8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+.tut-btn-no { background: transparent; color: #b8b6b4; border: 1px solid #b8b6b4; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+.tut-btn-yes:hover { background: #1557b0; }
+.tut-btn-no:hover { background: #fff; color: #171d25; }
+
+.tut-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); display: none; justify-content: center;
+    align-items: center; z-index: 1000000; backdrop-filter: blur(3px);
+}
+.tut-modal-box {
+    background: white; padding: 30px; border-radius: 12px; max-width: 450px;
+    text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-family: 'Samsung Sharp Sans', sans-serif;
+}
+.tut-modal-box h3 { color: #1a73e8; margin-top: 0; }
+.tut-modal-box p { color: #333; font-size: 15px; line-height: 1.5; margin-bottom: 25px;}
+.tut-nav-btns { display: flex; justify-content: space-between; }
+@media (prefers-color-scheme: dark) {
+    .tut-modal-box { background: #1e1e1e; }
+    .tut-modal-box p { color: #eee; }
 }
 </style>
 
 <div class="steam-top-bar">
-<div class="steam-menu">
-<div class="steam-menu-item hamburguesa">&#9776;
-<div class="steam-dropdown">
-<div class="menu-action" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'es'); window.location.href = u.toString();">Español</div>
-<div class="menu-action" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'en'); window.location.href = u.toString();">English</div>
+    <div class="steam-menu">
+        <div class="steam-menu-item hamburguesa">&#9776;
+            <div class="steam-dropdown">
+                <div class="menu-action" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'es'); window.location.href = u.toString();">Español</div>
+                <div class="menu-action" onclick="let u = new URL(window.location.href); u.searchParams.set('lang', 'en'); window.location.href = u.toString();">English</div>
+            </div>
+        </div>
+    </div>
+    <div class="steam-logo">Universidad Veracruzana</div>
+    <div class="steam-menu">
+        <div class="steam-menu-item">Archivo
+            <div class="steam-dropdown">
+                <div class="menu-action" onclick="window.location.reload();">Recargar plataforma</div>
+                <div class="menu-action" onclick="window.print();">Imprimir resultados</div>
+            </div>
+        </div>
+        <div class="steam-menu-item">Ver
+            <div class="steam-dropdown">
+                <div class="menu-action" onclick="if(!document.fullscreenElement){document.documentElement.requestFullscreen();}else{document.exitFullscreen();}">Pantalla Completa</div>
+                <div class="menu-action" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) + 0.1).toString();">Zoom +</div>
+                <div class="menu-action" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) - 0.1).toString();">Zoom -</div>
+                <div class="menu-action" onclick="let u = new URL(window.location.href); let t = u.searchParams.get('theme') === 'dark' ? 'light' : 'dark'; u.searchParams.set('theme', t); window.location.href = u.toString();">Modo Claro / Oscuro</div>
+            </div>
+        </div>
+        <div class="steam-menu-item">Ayuda
+            <div class="steam-dropdown">
+                <a href="https://github.com/Azavkm/Metodos-UV" target="_blank">Repositorio de GitHub</a>
+                <div class="menu-action" onclick="abrirTutorialManual()">Ver Tutorial Interactvo</div>
+                <div class="menu-action" onclick="alert('Plataforma de Análisis Numérico v6.0\\\\nDesarrollada para la Universidad Veracruzana.\\\\nMotor Matemático: Streamlit + SymPy');">Acerca de...</div>
+            </div>
+        </div>
+    </div>
+    <div class="steam-right">
+        <div class="steam-menu-item steam-profile">Azael
+            <div class="steam-dropdown" style="left: auto; right: 0;">
+                <div class="menu-action" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;">Restablecer Sistema</div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div id="tut-toast" class="tut-toast">
+    <div style="font-weight: bold; font-size: 14px;">👋 ¿Eres nuevo por aquí?</div>
+    <div style="font-size: 13px; color: #c7d5e0;">Aprende a calcular raíces paso a paso con nuestra guía rápida.</div>
+    <div class="tut-buttons">
+        <button class="tut-btn-no" onclick="cerrarToast()">Omitir</button>
+        <button class="tut-btn-yes" onclick="iniciarTutorial()">Comenzar Guía</button>
+    </div>
 </div>
+
+<div id="tut-modal" class="tut-modal-overlay">
+    <div class="tut-modal-box">
+        <h3 id="tut-title">Título</h3>
+        <p id="tut-text">Texto del paso actual.</p>
+        <div class="tut-nav-btns">
+            <button class="tut-btn-no" id="tut-prev" onclick="pasoAnterior()">Anterior</button>
+            <button class="tut-btn-yes" id="tut-next" onclick="pasoSiguiente()">Siguiente</button>
+        </div>
+    </div>
 </div>
-<div class="steam-logo">Universidad Veracruzana</div>
-<div class="steam-menu">
-<div class="steam-menu-item">Archivo
-<div class="steam-dropdown">
-<div class="menu-action" onclick="window.location.reload();">Recargar plataforma</div>
-<div class="menu-action" onclick="window.print();">Imprimir resultados</div>
-</div>
-</div>
-<div class="steam-menu-item">Ver
-<div class="steam-dropdown">
-<div class="menu-action" onclick="if(!document.fullscreenElement){document.documentElement.requestFullscreen();}else{document.exitFullscreen();}">Pantalla Completa</div>
-<div class="menu-action" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) + 0.1).toString();">Zoom +</div>
-<div class="menu-action" onclick="document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) - 0.1).toString();">Zoom -</div>
-<div class="menu-action" onclick="let u = new URL(window.location.href); let t = u.searchParams.get('theme') === 'dark' ? 'light' : 'dark'; u.searchParams.set('theme', t); window.location.href = u.toString();">Modo Claro / Oscuro</div>
-</div>
-</div>
-<div class="steam-menu-item">Ayuda
-<div class="steam-dropdown">
-<a href="https://github.com/Azavkm/Metodos-UV" target="_blank">Repositorio de GitHub</a>
-<div class="menu-action" onclick="alert('Plataforma de Análisis Numérico v6.0\\\\nDesarrollada para la Universidad Veracruzana.\\\\nMotor Matemático: Streamlit + SymPy');">Acerca de...</div>
-</div>
-</div>
-</div>
-<div class="steam-right">
-<div class="steam-menu-item steam-profile">Azael
-<div class="steam-dropdown" style="left: auto; right: 0;">
-<div class="menu-action" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;">Restablecer Sistema</div>
-</div>
-</div>
-</div>
-</div>
+
+<script>
+    const pasosTutorial = [
+        {title: "¡Bienvenido a la Plataforma!", text: "Esta herramienta resuelve ecuaciones utilizando 5 métodos numéricos simultáneos. Ideal para comparar su eficiencia en tiempo real."},
+        {title: "1. Ingresa tu Función", text: "En el panel izquierdo, escribe tu función f(x) usando lenguaje matemático natural. Ej: 'x^2 - 4' o 'sin(x)'. Puedes previsualizar su gráfica al instante."},
+        {title: "2. Define los Parámetros", text: "Ajusta los límites inferior (xl) y superior (xu) para los métodos cerrados, y el punto inicial (x0) para los abiertos. No olvides fijar tu tolerancia."},
+        {title: "3. Calcula las Raíces", text: "Haz clic en el botón azul 'CALCULAR RAÍCES'. El motor procesará todos los algoritmos a la vez."},
+        {title: "4. Analiza los Resultados", text: "A la derecha verás una gráfica comparativa con las raíces encontradas por cada método. Expande cada caja para ver la tabla iterativa completa."},
+        {title: "¡Todo Listo!", text: "Recuerda que puedes usar el menú superior (Archivo, Ver, Ayuda) para usar pantalla completa o imprimir tus reportes. ¡Éxito en tus cálculos!"}
+    ];
+    let pasoActual = 0;
+
+    function cerrarToast() {
+        document.getElementById('tut-toast').style.display = 'none';
+        sessionStorage.setItem('tutorialVisto', 'true');
+    }
+
+    function abrirTutorialManual() {
+        pasoActual = 0;
+        document.getElementById('tut-modal').style.display = 'flex';
+        actualizarModal();
+    }
+
+    function iniciarTutorial() {
+        cerrarToast();
+        abrirTutorialManual();
+    }
+
+    function cerrarModal() {
+        document.getElementById('tut-modal').style.display = 'none';
+    }
+
+    function actualizarModal() {
+        document.getElementById('tut-title').innerText = pasosTutorial[pasoActual].title;
+        document.getElementById('tut-text').innerText = pasosTutorial[pasoActual].text;
+        document.getElementById('tut-prev').style.visibility = pasoActual === 0 ? 'hidden' : 'visible';
+        document.getElementById('tut-next').innerText = pasoActual === pasosTutorial.length - 1 ? 'Finalizar' : 'Siguiente';
+    }
+
+    function pasoSiguiente() {
+        if (pasoActual < pasosTutorial.length - 1) {
+            pasoActual++;
+            actualizarModal();
+        } else {
+            cerrarModal();
+        }
+    }
+
+    function pasoAnterior() {
+        if (pasoActual > 0) {
+            pasoActual--;
+            actualizarModal();
+        }
+    }
+
+    // Mostrar el toast si no se ha visto en la sesión actual, después de 1 segundo
+    setTimeout(() => {
+        if(!sessionStorage.getItem('tutorialVisto')) {
+            const toast = document.getElementById('tut-toast');
+            if(toast) toast.style.display = 'flex';
+        }
+    }, 1000);
+</script>
 """, unsafe_allow_html=True)
 
 
