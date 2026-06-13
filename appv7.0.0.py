@@ -101,7 +101,17 @@ LANG = {
         "HELP_PARAMS": "### PARÁMETROS\n* **$x_l$ y $x_u$:** Requeridos para Bisección y Falsa Posición (deben encerrar la raíz).\n* **$x_0$:** Requerido para Newton-Raphson y Punto Fijo como valor inicial de búsqueda.\n* **$\\epsilon$:** El criterio de detención. El cálculo se detendrá cuando el error absoluto sea menor a este valor.",
         "EX_1_TITLE": "Ejemplo 1: Polinomio Algebraico",
         "EX_2_TITLE": "Ejemplo 2: Ecuación Trascendente",
-        "EX_3_TITLE": "Ejemplo 3: Convergencia de Punto Fijo"
+        "EX_3_TITLE": "Ejemplo 3: Convergencia de Punto Fijo",
+        "REG_TITLE": "REGRESIÓN LINEAL (MÍNIMOS CUADRADOS)",
+        "REG_DATA": "Ingreso de Datos",
+        "REG_ADD_DEL": "Haz doble clic para editar. Puedes agregar o eliminar filas en la última celda.",
+        "CALC_REG_BTN": "CALCULAR AJUSTE LINEAL",
+        "REG_RES": "Resultados de la Regresión",
+        "MODEL_EQ": "Ecuación del Modelo:",
+        "COEF_CORR": "Coeficiente de Correlación (r)",
+        "COEF_DET": "Coeficiente de Determinación (R²)",
+        "GRAPH_REG": "Gráfica de Ajuste",
+        "ERR_DATA": "ERROR: Por favor ingresa al menos 2 puntos de datos válidos."
     },
     "ENGLISH": {
         "TITLE": "NUMERICAL ANALYSIS PLATFORM",
@@ -155,7 +165,17 @@ LANG = {
         "HELP_PARAMS": "### PARAMETERS\n* **$x_l$ and $x_u$:** Required for Bisection and False Position (must enclose the root).\n* **$x_0$:** Required for Newton-Raphson and Fixed Point as the initial search value.\n* **$\\epsilon$:** The stopping criterion. Calculation stops when the absolute error is less than this value.",
         "EX_1_TITLE": "Example 1: Algebraic Polynomial",
         "EX_2_TITLE": "Example 2: Transcendental Equation",
-        "EX_3_TITLE": "Example 3: Fixed Point Convergence"
+        "EX_3_TITLE": "Example 3: Fixed Point Convergence",
+        "REG_TITLE": "LINEAR REGRESSION (LEAST SQUARES)",
+        "REG_DATA": "Data Input",
+        "REG_ADD_DEL": "Double click to edit. You can add or delete rows at the bottom.",
+        "CALC_REG_BTN": "CALCULATE LINEAR FIT",
+        "REG_RES": "Regression Results",
+        "MODEL_EQ": "Model Equation:",
+        "COEF_CORR": "Correlation Coefficient (r)",
+        "COEF_DET": "Coefficient of Determination (R²)",
+        "GRAPH_REG": "Fit Graph",
+        "ERR_DATA": "ERROR: Please enter at least 2 valid data points."
     }
 }
 
@@ -708,8 +728,111 @@ with tab_raices:
 # PESTAÑA 2: REGRESIÓN E INTERPOLACIÓN
 # ==========================================
 with tab_regresion:
-    st.markdown(f"### {t['TAB2']}")
-    st.info(t["CONSTRUCTION"])
+    st.markdown(f"### {t.get('REG_TITLE', 'REGRESIÓN LINEAL')}")
+    
+    col_data, col_res_reg = st.columns([1, 2], gap="large")
+    
+    with col_data:
+        st.markdown(f"**{t.get('REG_DATA', 'Ingreso de Datos')}**")
+        st.caption(t.get('REG_ADD_DEL', 'Edita, agrega o elimina filas.'))
+        
+        # Inicializar un DataFrame por defecto en el session_state para que no se borre al interactuar
+        if 'df_reg' not in st.session_state:
+            st.session_state.df_reg = pd.DataFrame({
+                "X": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+                "Y": [0.5, 2.5, 2.0, 4.0, 3.5, 6.0, 5.5]
+            })
+            
+        # El data_editor permite copiar/pegar desde Excel y agregar filas dinámicamente
+        edited_df = st.data_editor(
+            st.session_state.df_reg, 
+            num_rows="dynamic", 
+            use_container_width=True,
+            hide_index=True
+        )
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        ejecutar_reg = st.button(t.get('CALC_REG_BTN', 'CALCULAR'), use_container_width=True)
+
+    with col_res_reg:
+        st.markdown(f"### {t.get('REG_RES', 'Resultados')}")
+        if ejecutar_reg:
+            # Limpiar filas vacías o con NaN
+            df_clean = edited_df.dropna()
+            n = len(df_clean)
+            
+            if n < 2:
+                st.error(t.get('ERR_DATA', 'Ingresa al menos 2 puntos válidos.'))
+            else:
+                x_data = df_clean["X"].values
+                y_data = df_clean["Y"].values
+                
+                # Fórmulas de Mínimos Cuadrados Lineal
+                sum_x = np.sum(x_data)
+                sum_y = np.sum(y_data)
+                sum_xy = np.sum(x_data * y_data)
+                sum_x2 = np.sum(x_data**2)
+                
+                # Calcular coeficientes a1 (pendiente) y a0 (intersección)
+                denominador = (n * sum_x2 - sum_x**2)
+                if denominador == 0:
+                    st.error("División por cero en el cálculo de la pendiente. Revisa que las X no sean todas iguales.")
+                else:
+                    a1 = (n * sum_xy - sum_x * sum_y) / denominador
+                    a0 = np.mean(y_data) - a1 * np.mean(x_data)
+                    
+                    # Cálculo de r y R^2
+                    st_dev_tot = np.sum((y_data - np.mean(y_data))**2)
+                    st_dev_res = np.sum((y_data - (a0 + a1 * x_data))**2)
+                    
+                    r2 = 1 - (st_dev_res / st_dev_tot) if st_dev_tot != 0 else 1
+                    r = np.sqrt(abs(r2)) * (1 if a1 > 0 else -1)
+                    
+                    # Mostrar ecuación resultante destacada
+                    st.info(f"**{t.get('MODEL_EQ', 'Ecuación:')}** $y = {a1:.5f}x {'+' if a0 >= 0 else ''} {a0:.5f}$")
+                    
+                    # Mostrar métricas en columnas
+                    c1, c2 = st.columns(2)
+                    c1.metric(t.get('COEF_CORR', 'r'), f"{r:.5f}")
+                    c2.metric(t.get('COEF_DET', 'R²'), f"{r2:.5f}")
+                    
+                    # Generar Gráfica con Plotly
+                    fig_reg = go.Figure()
+                    
+                    # Añadir puntos experimentales
+                    fig_reg.add_trace(go.Scatter(
+                        x=x_data, y=y_data, 
+                        mode='markers', 
+                        name='Datos Originales',
+                        marker=dict(size=10, color='#ff4d4d', symbol='circle', line=dict(width=2, color='white'))
+                    ))
+                    
+                    # Añadir línea de ajuste
+                    x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
+                    y_line = a0 + a1 * x_line
+                    fig_reg.add_trace(go.Scatter(
+                        x=x_line, y=y_line, 
+                        mode='lines', 
+                        name='Ajuste Lineal',
+                        line=dict(color='#1a73e8', width=3, dash='solid')
+                    ))
+                    
+                    # Aplicar el mismo estilo gráfico que usas en el módulo de raíces
+                    fig_reg.update_layout(
+                        title=t.get('GRAPH_REG', 'Gráfica de Ajuste Lineal'),
+                        xaxis_title=t["AXIS_X"],
+                        yaxis_title=t["AXIS_Y"],
+                        hovermode="x unified",
+                        margin=dict(l=20, r=20, t=40, b=20),
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)'
+                    )
+                    fig_reg.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    fig_reg.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    
+                    st.plotly_chart(fig_reg, use_container_width=True)
+        else:
+            st.info(t["INFO_START"])
 
 # ==========================================
 # PESTAÑA 3: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
