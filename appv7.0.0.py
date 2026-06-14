@@ -122,6 +122,15 @@ LANG = {
         "INT_RES": "Resultado de la Interpolación",
         "INT_EQ": "Sustitución en la fórmula:",
         "ERR_X_EQUAL": "ERROR: $x_0$ y $x_1$ no pueden ser iguales (división por cero).",
+        "METHOD_LAGRANGE": "Interpolación (Lagrange)",
+        "LAG_TITLE": "INTERPOLACIÓN POLINOMIAL DE LAGRANGE",
+        "LAG_DATA": "Puntos Conocidos (x, y)",
+        "LAG_ADD_DEL": "Agrega tantos puntos como necesites. No repitas valores de X.",
+        "LAG_X_VAL": "Valor a interpolar $x$:",
+        "CALC_LAG_BTN": "CALCULAR POLINOMIO",
+        "LAG_RES": "Resultado de Lagrange",
+        "LAG_POLY": "Polinomio Evaluado:",
+        "ERR_DUP_X": "ERROR: Hay valores de X repetidos. Esto causa división por cero en Lagrange.",
     },
     "ENGLISH": {
         "TITLE": "NUMERICAL ANALYSIS PLATFORM",
@@ -195,7 +204,16 @@ LANG = {
         "CALC_INT_BTN": "CALCULATE INTERPOLATION",
         "INT_RES": "Interpolation Result",
         "INT_EQ": "Formula substitution:",
-        "ERR_X_EQUAL": "ERROR: $x_0$ and $x_1$ cannot be equal (division by zero)."
+        "ERR_X_EQUAL": "ERROR: $x_0$ and $x_1$ cannot be equal (division by zero).",
+        "METHOD_LAGRANGE": "Interpolation (Lagrange)",
+        "LAG_TITLE": "LAGRANGE POLYNOMIAL INTERPOLATION",
+        "LAG_DATA": "Known Points (x, y)",
+        "LAG_ADD_DEL": "Add as many points as needed. Do not repeat X values.",
+        "LAG_X_VAL": "Value to interpolate $x$:",
+        "CALC_LAG_BTN": "CALCULATE POLYNOMIAL",
+        "LAG_RES": "Lagrange Result",
+        "LAG_POLY": "Evaluated Polynomial:",
+        "ERR_DUP_X": "ERROR: Duplicate X values found. This causes division by zero in Lagrange."
     }
 }
 
@@ -748,10 +766,12 @@ with tab_raices:
 # PESTAÑA 2: REGRESIÓN E INTERPOLACIÓN
 # ==========================================
 with tab_regresion:
-    # Submenú interno para alternar métodos
+    # Submenú interno de 3 opciones
     metodo_tab2 = st.radio(
         "", 
-        [t.get("METHOD_LS", "Mínimos Cuadrados"), t.get("METHOD_NEWTON_LIN", "Interpolación Lineal")], 
+        [t.get("METHOD_LS", "Mínimos Cuadrados"), 
+         t.get("METHOD_NEWTON_LIN", "Interpolación Lineal"),
+         t.get("METHOD_LAGRANGE", "Interpolación Lagrange")], 
         horizontal=True, 
         label_visibility="collapsed"
     )
@@ -763,26 +783,16 @@ with tab_regresion:
     # ------------------------------------------
     if metodo_tab2 == t.get("METHOD_LS", "Mínimos Cuadrados"):
         st.markdown(f"### {t.get('REG_TITLE', 'REGRESIÓN LINEAL (MÍNIMOS CUADRADOS)')}")
-        
         col_data, col_res_reg = st.columns([1, 2], gap="large")
         
         with col_data:
             st.markdown(f"**{t.get('REG_DATA', 'Ingreso de Datos')}**")
-            st.caption(t.get('REG_ADD_DEL', 'Haz doble clic para editar. Puedes agregar o eliminar filas en la última celda.'))
+            st.caption(t.get('REG_ADD_DEL', 'Haz doble clic para editar.'))
             
             if 'df_reg' not in st.session_state:
-                st.session_state.df_reg = pd.DataFrame({
-                    "X": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-                    "Y": [0.5, 2.5, 2.0, 4.0, 3.5, 6.0, 5.5]
-                })
+                st.session_state.df_reg = pd.DataFrame({"X": [1.0, 2.0, 3.0, 4.0], "Y": [0.5, 2.5, 2.0, 4.0]})
                 
-            edited_df = st.data_editor(
-                st.session_state.df_reg, 
-                num_rows="dynamic", 
-                use_container_width=True,
-                hide_index=True
-            )
-            
+            edited_df = st.data_editor(st.session_state.df_reg, num_rows="dynamic", use_container_width=True, hide_index=True)
             st.markdown("<br>", unsafe_allow_html=True)
             ejecutar_reg = st.button(t.get('CALC_REG_BTN', 'CALCULAR AJUSTE LINEAL'), use_container_width=True)
 
@@ -791,66 +801,37 @@ with tab_regresion:
             if ejecutar_reg:
                 df_clean = edited_df.dropna()
                 n = len(df_clean)
-                
                 if n < 2:
-                    st.error(t.get('ERR_DATA', 'ERROR: Por favor ingresa al menos 2 puntos de datos válidos.'))
+                    st.error(t.get('ERR_DATA', 'ERROR: Ingresa al menos 2 puntos válidos.'))
                 else:
-                    x_data = df_clean["X"].values
-                    y_data = df_clean["Y"].values
-                    
-                    sum_x = np.sum(x_data)
-                    sum_y = np.sum(y_data)
-                    sum_xy = np.sum(x_data * y_data)
-                    sum_x2 = np.sum(x_data**2)
+                    x_data, y_data = df_clean["X"].values, df_clean["Y"].values
+                    sum_x, sum_y = np.sum(x_data), np.sum(y_data)
+                    sum_xy, sum_x2 = np.sum(x_data * y_data), np.sum(x_data**2)
                     
                     denominador = (n * sum_x2 - sum_x**2)
                     if denominador == 0:
-                        st.error("División por cero en el cálculo de la pendiente. Revisa que las X no sean todas iguales.")
+                        st.error("División por cero. Revisa que las X no sean iguales.")
                     else:
                         a1 = (n * sum_xy - sum_x * sum_y) / denominador
                         a0 = np.mean(y_data) - a1 * np.mean(x_data)
                         
                         st_dev_tot = np.sum((y_data - np.mean(y_data))**2)
                         st_dev_res = np.sum((y_data - (a0 + a1 * x_data))**2)
-                        
                         r2 = 1 - (st_dev_res / st_dev_tot) if st_dev_tot != 0 else 1
                         r = np.sqrt(abs(r2)) * (1 if a1 > 0 else -1)
                         
-                        st.info(f"**{t.get('MODEL_EQ', 'Ecuación del Modelo:')}** $y = {a1:.5f}x {'+' if a0 >= 0 else ''} {a0:.5f}$")
-                        
+                        st.info(f"**{t.get('MODEL_EQ', 'Ecuación:')}** $y = {a1:.5f}x {'+' if a0 >= 0 else ''} {a0:.5f}$")
                         c1, c2 = st.columns(2)
-                        c1.metric(t.get('COEF_CORR', 'Coeficiente de Correlación (r)'), f"{r:.5f}")
-                        c2.metric(t.get('COEF_DET', 'Coeficiente de Determinación (R²)'), f"{r2:.5f}")
+                        c1.metric(t.get('COEF_CORR', 'r'), f"{r:.5f}")
+                        c2.metric(t.get('COEF_DET', 'R²'), f"{r2:.5f}")
                         
                         fig_reg = go.Figure()
-                        fig_reg.add_trace(go.Scatter(
-                            x=x_data, y=y_data, 
-                            mode='markers', 
-                            name='Datos Originales',
-                            marker=dict(size=10, color='#ff4d4d', symbol='circle', line=dict(width=2, color='white'))
-                        ))
+                        fig_reg.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', name='Datos', marker=dict(size=10, color='#ff4d4d')))
                         
                         x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
-                        y_line = a0 + a1 * x_line
-                        fig_reg.add_trace(go.Scatter(
-                            x=x_line, y=y_line, 
-                            mode='lines', 
-                            name='Ajuste Lineal',
-                            line=dict(color='#1a73e8', width=3, dash='solid')
-                        ))
+                        fig_reg.add_trace(go.Scatter(x=x_line, y=a0 + a1 * x_line, mode='lines', name='Ajuste', line=dict(color='#1a73e8', width=3)))
                         
-                        fig_reg.update_layout(
-                            title=t.get('GRAPH_REG', 'Gráfica de Ajuste'),
-                            xaxis_title=t["AXIS_X"],
-                            yaxis_title=t["AXIS_Y"],
-                            hovermode="x unified",
-                            margin=dict(l=20, r=20, t=40, b=20),
-                            plot_bgcolor='rgba(0,0,0,0)',
-                            paper_bgcolor='rgba(0,0,0,0)'
-                        )
-                        fig_reg.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
-                        fig_reg.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
-                        
+                        fig_reg.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                         st.plotly_chart(fig_reg, use_container_width=True)
             else:
                 st.info(t["INFO_START"])
@@ -858,9 +839,8 @@ with tab_regresion:
     # ------------------------------------------
     # OPCIÓN B: INTERPOLACIÓN LINEAL DE NEWTON
     # ------------------------------------------
-    else:
+    elif metodo_tab2 == t.get("METHOD_NEWTON_LIN", "Interpolación Lineal"):
         st.markdown(f"### {t.get('INT_TITLE', 'INTERPOLACIÓN LINEAL DE NEWTON')}")
-        
         col_data, col_res_int = st.columns([1, 2], gap="large")
         
         with col_data:
@@ -887,48 +867,108 @@ with tab_regresion:
                 if x0_int == x1_int:
                     st.error(t.get('ERR_X_EQUAL', 'ERROR: $x_0$ y $x_1$ no pueden ser iguales.'))
                 else:
-                    # Cálculo de la interpolación lineal de Newton
-                    # f1(x) = f(x0) + [(f(x1) - f(x0)) / (x1 - x0)] * (x - x0)
                     diferencia_dividida = (y1_int - y0_int) / (x1_int - x0_int)
                     fx_target = y0_int + diferencia_dividida * (x_target - x0_int)
-                    
                     st.metric(label=f"$f({x_target})$", value=f"{fx_target:.5f}")
                     
                     st.info(f"**{t.get('INT_EQ', 'Sustitución:')}** $f_1({x_target}) = {y0_int} + \\left(\\frac{{{y1_int} - {y0_int}}}{{{x1_int} - {x0_int}}}\\right) ({x_target} - {x0_int})$")
                     
-                    # Gráfica de la interpolación
                     fig_int = go.Figure()
+                    fig_int.add_trace(go.Scatter(x=[x0_int, x1_int], y=[y0_int, y1_int], mode='markers+lines', name='Intervalo', marker=dict(size=10, color='#1a73e8')))
+                    fig_int.add_trace(go.Scatter(x=[x_target], y=[fx_target], mode='markers', name='Punto Interpolado', marker=dict(size=12, color='#ff4d4d', symbol='star')))
+                    fig_int.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
+                    st.plotly_chart(fig_int, use_container_width=True)
+            else:
+                st.info(t["INFO_START"])
+
+    # ------------------------------------------
+    # OPCIÓN C: INTERPOLACIÓN DE LAGRANGE
+    # ------------------------------------------
+    elif metodo_tab2 == t.get("METHOD_LAGRANGE", "Interpolación Lagrange"):
+        st.markdown(f"### {t.get('LAG_TITLE', 'INTERPOLACIÓN POLINOMIAL DE LAGRANGE')}")
+        col_data, col_res_lag = st.columns([1, 2], gap="large")
+        
+        with col_data:
+            st.markdown(f"**{t.get('LAG_DATA', 'Puntos Conocidos')}**")
+            st.caption(t.get('LAG_ADD_DEL', 'Agrega puntos. No repitas X.'))
+            
+            if 'df_lag' not in st.session_state:
+                st.session_state.df_lag = pd.DataFrame({"X": [1.0, 4.0, 6.0], "Y": [1.5, 3.0, 5.0]})
+                
+            edited_df_lag = st.data_editor(st.session_state.df_lag, num_rows="dynamic", use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            st.markdown(f"**{t.get('LAG_X_VAL', 'Valor a interpolar $x$:')}**")
+            x_target_lag = st.number_input("x_lag", value=3.0, format="%.5f", label_visibility="collapsed")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            ejecutar_lag = st.button(t.get('CALC_LAG_BTN', 'CALCULAR POLINOMIO'), use_container_width=True)
+
+        with col_res_lag:
+            st.markdown(f"### {t.get('LAG_RES', 'Resultado de Lagrange')}")
+            if ejecutar_lag:
+                df_clean_lag = edited_df_lag.dropna()
+                x_vals = df_clean_lag["X"].values
+                y_vals = df_clean_lag["Y"].values
+                n_lag = len(x_vals)
+                
+                # Validaciones
+                if n_lag < 2:
+                    st.error(t.get('ERR_DATA', 'ERROR: Ingresa al menos 2 puntos válidos.'))
+                elif len(set(x_vals)) != len(x_vals):
+                    st.error(t.get('ERR_DUP_X', 'ERROR: Valores de X repetidos.'))
+                else:
+                    # Función interna para evaluar Lagrange en un punto
+                    def lagrange_eval(x_target):
+                        resultado = 0.0
+                        for i in range(n_lag):
+                            termino = y_vals[i]
+                            for j in range(n_lag):
+                                if i != j:
+                                    termino = termino * (x_target - x_vals[j]) / (x_vals[i] - x_vals[j])
+                            resultado += termino
+                        return resultado
+
+                    # Cálculo del punto objetivo
+                    fx_target_lag = lagrange_eval(x_target_lag)
+                    st.metric(label=f"$P_{n_lag-1}({x_target_lag})$", value=f"{fx_target_lag:.5f}")
+                    
+                    # Graficación
+                    fig_lag = go.Figure()
                     
                     # Puntos base
-                    fig_int.add_trace(go.Scatter(
-                        x=[x0_int, x1_int], y=[y0_int, y1_int], 
-                        mode='markers+lines', 
-                        name='Intervalo de Interpolación',
-                        marker=dict(size=10, color='#1a73e8', symbol='circle'),
-                        line=dict(color='#1a73e8', width=2, dash='solid')
+                    fig_lag.add_trace(go.Scatter(
+                        x=x_vals, y=y_vals, 
+                        mode='markers', 
+                        name='Puntos Conocidos',
+                        marker=dict(size=10, color='#1a73e8', symbol='circle')
                     ))
                     
                     # Punto interpolado
-                    fig_int.add_trace(go.Scatter(
-                        x=[x_target], y=[fx_target], 
+                    fig_lag.add_trace(go.Scatter(
+                        x=[x_target_lag], y=[fx_target_lag], 
                         mode='markers', 
-                        name=f'Punto Interpolado ({x_target}, {fx_target:.3f})',
-                        marker=dict(size=12, color='#ff4d4d', symbol='star')
+                        name=f'Punto Interpolado ({x_target_lag}, {fx_target_lag:.3f})',
+                        marker=dict(size=14, color='#ff4d4d', symbol='star')
                     ))
                     
-                    fig_int.update_layout(
-                        title=t.get('GRAPH_REG', 'Gráfica'),
-                        xaxis_title=t["AXIS_X"],
-                        yaxis_title=t["AXIS_Y"],
-                        hovermode="x unified",
-                        margin=dict(l=20, r=20, t=40, b=20),
-                        plot_bgcolor='rgba(0,0,0,0)',
-                        paper_bgcolor='rgba(0,0,0,0)'
-                    )
-                    fig_int.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
-                    fig_int.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    # Curva polinomial (generando 100 puntos en el rango)
+                    x_rango = np.linspace(min(x_vals) - 1, max(x_vals) + 1, 100)
+                    y_rango = [lagrange_eval(xi) for xi in x_rango]
                     
-                    st.plotly_chart(fig_int, use_container_width=True)
+                    fig_lag.add_trace(go.Scatter(
+                        x=x_rango, y=y_rango, 
+                        mode='lines', 
+                        name=f'Polinomio $P_{n_lag-1}(x)$',
+                        line=dict(color='rgba(26, 115, 232, 0.5)', width=2, dash='dot')
+                    ))
+                    
+                    fig_lag.update_layout(
+                        title=t.get('GRAPH_REG', 'Gráfica'),
+                        xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"],
+                        hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20)
+                    )
+                    st.plotly_chart(fig_lag, use_container_width=True)
             else:
                 st.info(t["INFO_START"])
 # ==========================================
