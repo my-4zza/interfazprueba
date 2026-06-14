@@ -500,8 +500,13 @@ if st.session_state.get("expert_mode", False):
     st.caption("⚙️ **MODO EXPERTO ACTIVADO:** Monitor de rendimiento en segundo plano listo.")
 
 # Creación de Pestañas 
-tab_raices, tab_regresion, tab_derivacion, tab_integracion, tab_edo, tab_info, tab_ayuda, tab_ejemplos = st.tabs([
-    t["TAB1"], t["TAB2"], t.get("TAB3", "DERIVACIÓN"), t.get("TAB4", "INTEGRACIÓN"), t.get("TAB5", "E.D.O."), t["TAB_INFO"], t["TAB_HELP"], t["TAB_EXAMPLES"]
+tab_raices, tab_regresion, tab_derivacion, tab_integracion, tab_edo, tab_ayuda = tab_raices, tab_regresion, tab_derivacion, tab_integracion, tab_edo, tab_ayuda = st.tabs([
+    t["TAB1"], 
+    t["TAB2"], 
+    t.get("TAB3", "DERIVACIÓN"), 
+    t.get("TAB4", "INTEGRACIÓN"), 
+    t.get("TAB5", "E.D.O."), 
+    t["TAB_HELP"]
 ])
 
 x = sp.Symbol('x')
