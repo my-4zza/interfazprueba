@@ -138,6 +138,24 @@ LANG = {
         "CALC_DF_BTN": "CALCULAR DERIVADAS",
         "DF_RES": "Resultados de Aproximación",
         "ERR_H_ZERO": "ERROR: El tamaño de paso h no puede ser cero.",
+        "TAB4": "INTEGRACIÓN NUMÉRICA",
+        "INTG_TITLE": "MÉTODO DEL TRAPECIO",
+        "INTG_METHOD": "Selecciona la variante:",
+        "TRAP_SIMPLE": "Trapecio Simple",
+        "TRAP_MULTIPLE": "Trapecio Múltiple",
+        "INTG_A": "Límite inferior $a$:",
+        "INTG_B": "Límite superior $b$:",
+        "INTG_N": "Número de intervalos $n$:",
+        "CALC_INTG_BTN": "CALCULAR ÁREA",
+        "INTG_RES": "Resultados de Integración",
+        "EXACT_AREA": "Área Alta Resolución (Ref.)",
+        "APPROX_AREA": "Área Aproximada",
+        "ERR_LIMITS": "ERROR: El límite superior b debe ser mayor al límite inferior a.",
+        "SIMPSON_METHOD": "Simpson (1/3 y 3/8)",
+        "SIMP_TITLE": "MÉTODO DE SIMPSON",
+        "ERR_N_SIMPSON": "ERROR: El método de Simpson requiere al menos n=2 intervalos.",
+        "INFO_SIMPSON_EVEN": "Se aplicó **Simpson 1/3** en todo el rango porque $n$ es par.",
+        "INFO_SIMPSON_ODD": "Se aplicó **Simpson 1/3** al principio y **Simpson 3/8** en los últimos 3 intervalos porque $n$ es impar.",
     },
     "ENGLISH": {
         "TITLE": "NUMERICAL ANALYSIS PLATFORM",
@@ -227,7 +245,25 @@ LANG = {
         "DF_H": "Step size $h$:",
         "CALC_DF_BTN": "CALCULATE DERIVATIVES",
         "DF_RES": "Approximation Results",
-        "ERR_H_ZERO": "ERROR: Step size h cannot be zero."
+        "ERR_H_ZERO": "ERROR: Step size h cannot be zero.",
+        "TAB4": "NUMERICAL INTEGRATION",
+        "INTG_TITLE": "TRAPEZOIDAL RULE",
+        "INTG_METHOD": "Select variant:",
+        "TRAP_SIMPLE": "Single Trapezoid",
+        "TRAP_MULTIPLE": "Multiple Trapezoids",
+        "INTG_A": "Lower limit $a$:",
+        "INTG_B": "Upper limit $b$:",
+        "INTG_N": "Number of intervals $n$:",
+        "CALC_INTG_BTN": "CALCULATE AREA",
+        "INTG_RES": "Integration Results",
+        "EXACT_AREA": "High-Res Area (Reference)",
+        "APPROX_AREA": "Approximate Area",
+        "ERR_LIMITS": "ERROR: Upper limit b must be greater than lower limit a.",
+        "SIMPSON_METHOD": "Simpson (1/3 & 3/8)",
+        "SIMP_TITLE": "SIMPSON'S RULE",
+        "ERR_N_SIMPSON": "ERROR: Simpson's rule requires at least n=2 intervals.",
+        "INFO_SIMPSON_EVEN": "Applied **Simpson 1/3** over the entire range because $n$ is even.",
+        "INFO_SIMPSON_ODD": "Applied **Simpson 1/3** initially and **Simpson 3/8** on the last 3 intervals because $n$ is odd."
     }
 }
 
@@ -426,8 +462,8 @@ if st.session_state.get("expert_mode", False):
     st.caption("⚙️ **MODO EXPERTO ACTIVADO:** Monitor de rendimiento en segundo plano listo.")
 
 # Creación de Pestañas 
-tab_raices, tab_regresion, tab_derivacion, tab_info, tab_ayuda, tab_ejemplos = st.tabs([
-    t["TAB1"], t["TAB2"], t.get("TAB3", "DERIVACIÓN"), t["TAB_INFO"], t["TAB_HELP"], t["TAB_EXAMPLES"]
+tab_raices, tab_regresion, tab_derivacion, tab_integracion, tab_info, tab_ayuda, tab_ejemplos = st.tabs([
+    t["TAB1"], t["TAB2"], t.get("TAB3", "DERIVACIÓN"), t.get("TAB4", "INTEGRACIÓN"), t["TAB_INFO"], t["TAB_HELP"], t["TAB_EXAMPLES"]
 ])
 
 x = sp.Symbol('x')
@@ -1086,7 +1122,149 @@ with tab_derivacion:
             st.info(t["INFO_START"])
 
 # ==========================================
-# PESTAÑA 4: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
+# PESTAÑA 4: INTEGRACIÓN NUMÉRICA (TRAPECIOS)
+# ==========================================
+with tab_integracion:
+    # Submenú interno de 3 opciones
+    metodo_intg = st.radio(
+        t.get("INTG_METHOD", "Selecciona la variante:"), 
+        [t.get("TRAP_SIMPLE", "Trapecio Simple"), 
+         t.get("TRAP_MULTIPLE", "Trapecio Múltiple"),
+         t.get("SIMPSON_METHOD", "Simpson (1/3 y 3/8)")], 
+        horizontal=True
+    )
+    
+    st.markdown("---")
+    
+    # Cambio dinámico de título según la selección
+    if metodo_intg == t.get("SIMPSON_METHOD", "Simpson (1/3 y 3/8)"):
+        st.markdown(f"### {t.get('SIMP_TITLE', 'MÉTODO DE SIMPSON')}")
+    else:
+        st.markdown(f"### {t.get('INTG_TITLE', 'MÉTODO DEL TRAPECIO')}")
+    
+    col_in_intg, col_out_intg = st.columns([1, 2], gap="large")
+    
+    with col_in_intg:
+        st.markdown(f"**{t.get('F_MAIN', 'Función $f(x)$:')}**")
+        f_str_intg = st.text_input("f(x)_intg", value="x**2 * exp(-x)", label_visibility="collapsed")
+        
+        c_lim1, c_lim2 = st.columns(2)
+        with c_lim1:
+            st.markdown(f"**{t.get('INTG_A', 'Límite $a$:')}**")
+            a_intg = st.number_input("a_intg", value=0.0, format="%.5f", label_visibility="collapsed")
+        with c_lim2:
+            st.markdown(f"**{t.get('INTG_B', 'Límite $b$:')}**")
+            b_intg = st.number_input("b_intg", value=3.0, format="%.5f", label_visibility="collapsed")
+            
+        n_intg = 1
+        # Pedir n solo si no es Trapecio Simple
+        if metodo_intg != t.get("TRAP_SIMPLE", "Trapecio Simple"):
+            st.markdown(f"**{t.get('INTG_N', 'Número de intervalos $n$:')}**")
+            # Si es Simpson, n debe ser al menos 2
+            min_n = 2 if metodo_intg == t.get("SIMPSON_METHOD", "Simpson (1/3 y 3/8)") else 1
+            n_intg = st.number_input("n_intg", min_value=min_n, max_value=1000, value=max(5, min_n), step=1, label_visibility="collapsed")
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        ejecutar_intg = st.button(t.get('CALC_INTG_BTN', 'CALCULAR ÁREA'), use_container_width=True)
+
+    with col_out_intg:
+        st.markdown(f"### {t.get('INTG_RES', 'Resultados de Integración')}")
+        if ejecutar_intg:
+            if a_intg >= b_intg:
+                st.error(t.get('ERR_LIMITS', 'ERROR: El límite superior debe ser mayor.'))
+            elif metodo_intg == t.get("SIMPSON_METHOD", "Simpson (1/3 y 3/8)") and n_intg < 2:
+                st.error(t.get('ERR_N_SIMPSON', 'ERROR: Se requieren al menos 2 intervalos.'))
+            else:
+                try:
+                    f_expr_intg = parse_expr(f_str_intg, transformations=transformations)
+                    f_lamb_intg = sp.lambdify(x, f_expr_intg, 'math')
+                    
+                    # 1. Cálculo del Área Exacta (Alta resolución)
+                    x_exact = np.linspace(a_intg, b_intg, 5000)
+                    y_exact = [f_lamb_intg(val) for val in x_exact]
+                    area_exacta = np.trapezoid(y_exact, x_exact)
+                    
+                    # 2. Vectores de evaluación
+                    h_intg = (b_intg - a_intg) / n_intg
+                    x_eval = np.linspace(a_intg, b_intg, n_intg + 1)
+                    y_eval = np.array([f_lamb_intg(val) for val in x_eval])
+                    
+                    area_aprox = 0.0
+                    
+                    # ------------------------------------------
+                    # ALGORITMOS DE INTEGRACIÓN
+                    # ------------------------------------------
+                    if metodo_intg == t.get("TRAP_SIMPLE", "Trapecio Simple"):
+                        area_aprox = (b_intg - a_intg) * (y_eval[0] + y_eval[1]) / 2.0
+                        
+                    elif metodo_intg == t.get("TRAP_MULTIPLE", "Trapecio Múltiple"):
+                        area_aprox = (h_intg / 2.0) * (y_eval[0] + 2 * np.sum(y_eval[1:-1]) + y_eval[-1])
+                        
+                    elif metodo_intg == t.get("SIMPSON_METHOD", "Simpson (1/3 y 3/8)"):
+                        if n_intg % 2 == 0:
+                            # Simpson 1/3 puro (n es par)
+                            area_aprox = (h_intg / 3.0) * (y_eval[0] + 4 * np.sum(y_eval[1:-1:2]) + 2 * np.sum(y_eval[2:-2:2]) + y_eval[-1])
+                            st.success(t.get("INFO_SIMPSON_EVEN", "Simpson 1/3 en todo el rango."))
+                        else:
+                            # Simpson combinado (n es impar, n >= 3)
+                            m = n_intg - 3
+                            area_13 = 0.0
+                            if m > 0:
+                                area_13 = (h_intg / 3.0) * (y_eval[0] + 4 * np.sum(y_eval[1:m:2]) + 2 * np.sum(y_eval[2:m-1:2]) + y_eval[m])
+                            
+                            area_38 = (3 * h_intg / 8.0) * (y_eval[m] + 3 * y_eval[m+1] + 3 * y_eval[m+2] + y_eval[m+3])
+                            area_aprox = area_13 + area_38
+                            st.success(t.get("INFO_SIMPSON_ODD", "Simpson 1/3 al inicio y 3/8 al final."))
+                    
+                    error_intg = abs(area_exacta - area_aprox)
+                    
+                    # Mostrar métricas
+                    c1, c2, c3 = st.columns(3)
+                    c1.metric(t.get('APPROX_AREA', 'Área Aproximada'), f"{area_aprox:.6f}")
+                    c2.metric(t.get('EXACT_AREA', 'Ref. Alta Resolución'), f"{area_exacta:.6f}")
+                    c3.metric(t.get('COL_ERR', 'Error Absoluto'), f"{error_intg:.6f}", delta_color="off")
+                    
+                    # 3. Gráfica de la Integración
+                    fig_intg = go.Figure()
+                    
+                    # Curva principal
+                    rango_x_curva = np.linspace(a_intg - 0.5, b_intg + 0.5, 300)
+                    rango_y_curva = [f_lamb_intg(val) for val in rango_x_curva]
+                    fig_intg.add_trace(go.Scatter(
+                        x=rango_x_curva, y=rango_y_curva, 
+                        mode='lines', name='Curva $f(x)$', 
+                        line=dict(color='#1a73e8', width=3)
+                    ))
+                    
+                    # Relleno del área aproximada
+                    fig_intg.add_trace(go.Scatter(
+                        x=x_eval, y=y_eval,
+                        mode='lines+markers',
+                        name='Puntos de Evaluación',
+                        fill='tozeroy', 
+                        fillcolor='rgba(255, 77, 77, 0.3)' if "Simpson" not in metodo_intg else 'rgba(0, 204, 102, 0.3)',
+                        line=dict(color='#ff4d4d' if "Simpson" not in metodo_intg else '#00cc66', width=2),
+                        marker=dict(size=8)
+                    ))
+                    
+                    fig_intg.update_layout(
+                        title="Área evaluada",
+                        xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"],
+                        hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20),
+                        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)'
+                    )
+                    fig_intg.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    fig_intg.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    
+                    st.plotly_chart(fig_intg, use_container_width=True)
+                    
+                except Exception as e:
+                    st.error(f"ERROR TÉCNICO DETECTADO: {e}")
+        else:
+            st.info(t["INFO_START"])
+
+# ==========================================
+# PESTAÑA 5: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
 # ==========================================
 with tab_ayuda:
     st.markdown(f"### {t['TAB_INFO']}")
