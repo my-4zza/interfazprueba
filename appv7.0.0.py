@@ -131,6 +131,13 @@ LANG = {
         "LAG_RES": "Resultado de Lagrange",
         "LAG_POLY": "Polinomio Evaluado:",
         "ERR_DUP_X": "ERROR: Hay valores de X repetidos. Esto causa división por cero en Lagrange.",
+        "TAB3": "DERIVACIÓN NUMÉRICA",
+        "DF_TITLE": "DIFERENCIAS FINITAS (1ra Derivada)",
+        "DF_X": "Punto a evaluar $x_i$:",
+        "DF_H": "Tamaño de paso $h$:",
+        "CALC_DF_BTN": "CALCULAR DERIVADAS",
+        "DF_RES": "Resultados de Aproximación",
+        "ERR_H_ZERO": "ERROR: El tamaño de paso h no puede ser cero.",
     },
     "ENGLISH": {
         "TITLE": "NUMERICAL ANALYSIS PLATFORM",
@@ -213,7 +220,14 @@ LANG = {
         "CALC_LAG_BTN": "CALCULATE POLYNOMIAL",
         "LAG_RES": "Lagrange Result",
         "LAG_POLY": "Evaluated Polynomial:",
-        "ERR_DUP_X": "ERROR: Duplicate X values found. This causes division by zero in Lagrange."
+        "ERR_DUP_X": "ERROR: Duplicate X values found. This causes division by zero in Lagrange.",
+        "TAB3": "NUMERICAL DIFFERENTIATION",
+        "DF_TITLE": "FINITE DIFFERENCES (1st Derivative)",
+        "DF_X": "Evaluation point $x_i$:",
+        "DF_H": "Step size $h$:",
+        "CALC_DF_BTN": "CALCULATE DERIVATIVES",
+        "DF_RES": "Approximation Results",
+        "ERR_H_ZERO": "ERROR: Step size h cannot be zero."
     }
 }
 
@@ -411,9 +425,9 @@ st.markdown(f"<h1>{t['TITLE']}</h1>", unsafe_allow_html=True)
 if st.session_state.get("expert_mode", False):
     st.caption("⚙️ **MODO EXPERTO ACTIVADO:** Monitor de rendimiento en segundo plano listo.")
 
-# Creación de Pestañas Reducidas (Ayuda, Info y Ejemplos fusionadas)
-tab_raices, tab_regresion, tab_ayuda = st.tabs([
-    t["TAB1"], t["TAB2"], t["TAB_HELP"]
+# Creación de Pestañas 
+tab_raices, tab_regresion, tab_derivacion, tab_info, tab_ayuda, tab_ejemplos = st.tabs([
+    t["TAB1"], t["TAB2"], t.get("TAB3", "DERIVACIÓN"), t["TAB_INFO"], t["TAB_HELP"], t["TAB_EXAMPLES"]
 ])
 
 x = sp.Symbol('x')
@@ -971,8 +985,108 @@ with tab_regresion:
                     st.plotly_chart(fig_lag, use_container_width=True)
             else:
                 st.info(t["INFO_START"])
+
 # ==========================================
-# PESTAÑA 3: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
+# PESTAÑA 3: DERIVACIÓN NUMÉRICA (DIFERENCIAS FINITAS)
+# ==========================================
+with tab_derivacion:
+    st.markdown(f"### {t.get('DF_TITLE', 'DIFERENCIAS FINITAS')}")
+    
+    col_in_df, col_out_df = st.columns([1, 2], gap="large")
+    
+    with col_in_df:
+        st.markdown(f"**{t.get('F_MAIN', 'Función $f(x)$:')}**")
+        f_str_df = st.text_input("f(x)_df", value="sin(x) + x**2", label_visibility="collapsed")
+        
+        st.markdown(f"**{t.get('DF_X', 'Punto a evaluar $x_i$:')}**")
+        xi = st.number_input("xi", value=1.0, format="%.5f", label_visibility="collapsed")
+        
+        st.markdown(f"**{t.get('DF_H', 'Tamaño de paso $h$:')}**")
+        h = st.number_input("h", value=0.1, format="%.5f", label_visibility="collapsed")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        ejecutar_df = st.button(t.get('CALC_DF_BTN', 'CALCULAR DERIVADAS'), use_container_width=True)
+        
+    with col_out_df:
+        st.markdown(f"### {t.get('DF_RES', 'Resultados de Aproximación')}")
+        if ejecutar_df:
+            if h == 0:
+                st.error(t.get('ERR_H_ZERO', 'ERROR: h no puede ser cero.'))
+            else:
+                try:
+                    # Preparar función y derivada exacta con Sympy
+                    f_expr_df = parse_expr(f_str_df, transformations=transformations)
+                    f_lamb_df = sp.lambdify(x, f_expr_df, 'math')
+                    
+                    df_expr_exact = sp.diff(f_expr_df, x)
+                    df_lamb_exact = sp.lambdify(x, df_expr_exact, 'math')
+                    
+                    # Cálculos exactos
+                    f_xi = f_lamb_df(xi)
+                    exact_val = df_lamb_exact(xi)
+                    
+                    # Puntos desplazados
+                    f_xi_mas_h = f_lamb_df(xi + h)
+                    f_xi_menos_h = f_lamb_df(xi - h)
+                    
+                    # Fórmulas de Diferencias Finitas
+                    df_adelante = (f_xi_mas_h - f_xi) / h
+                    df_atras = (f_xi - f_xi_menos_h) / h
+                    df_centrada = (f_xi_mas_h - f_xi_menos_h) / (2 * h)
+                    
+                    # Errores absolutos
+                    err_adelante = abs(exact_val - df_adelante)
+                    err_atras = abs(exact_val - df_atras)
+                    err_centrada = abs(exact_val - df_centrada)
+                    
+                    # Mostrar valor exacto analítico
+                    st.info(f"**Valor Exacto (Analítico):** $f'({xi}) = {exact_val:.6f}$")
+                    
+                    # Mostrar métricas de las aproximaciones
+                    c1, c2, c3 = st.columns(3)
+                    c1.metric("Hacia Adelante", f"{df_adelante:.5f}", f"Error: {err_adelante:.5f}", delta_color="off")
+                    c2.metric("Hacia Atrás", f"{df_atras:.5f}", f"Error: {err_atras:.5f}", delta_color="off")
+                    c3.metric("Centrada", f"{df_centrada:.5f}", f"Error: {err_centrada:.5f}", delta_color="off")
+                    
+                    # Graficar la función y las tangentes
+                    fig_df = go.Figure()
+                    
+                    # Rango visible de la gráfica (depende del paso h)
+                    rango_x = np.linspace(xi - 4*h, xi + 4*h, 150)
+                    rango_y = [f_lamb_df(val) for val in rango_x]
+                    
+                    # Curva principal
+                    fig_df.add_trace(go.Scatter(x=rango_x, y=rango_y, mode='lines', name='Curva $f(x)$', line=dict(color='#1a73e8', width=3)))
+                    
+                    # Línea Tangente Exacta
+                    y_tangente = exact_val * (rango_x - xi) + f_xi
+                    fig_df.add_trace(go.Scatter(x=rango_x, y=y_tangente, mode='lines', name='Tangente Exacta', line=dict(color='#00cc66', width=2, dash='dash')))
+                    
+                    # Puntos evaluados
+                    fig_df.add_trace(go.Scatter(
+                        x=[xi-h, xi, xi+h], y=[f_xi_menos_h, f_xi, f_xi_mas_h], 
+                        mode='markers', name='Puntos Evaluados', 
+                        marker=dict(size=10, color='#ff4d4d', symbol='circle-open', line=dict(width=2))
+                    ))
+                    
+                    fig_df.update_layout(
+                        title="Comparativa Visual de Pendientes",
+                        xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"],
+                        hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20),
+                        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)'
+                    )
+                    fig_df.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    fig_df.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    
+                    st.plotly_chart(fig_df, use_container_width=True)
+                    
+                except Exception as e:
+                    st.error(t.get('ERR_SYNTAX', 'ERROR: Sintaxis inválida o función no soportada.'))
+        else:
+            st.info(t["INFO_START"])
+
+# ==========================================
+# PESTAÑA 4: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
 # ==========================================
 with tab_ayuda:
     st.markdown(f"### {t['TAB_INFO']}")
