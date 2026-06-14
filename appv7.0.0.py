@@ -111,7 +111,17 @@ LANG = {
         "COEF_CORR": "Coeficiente de Correlación (r)",
         "COEF_DET": "Coeficiente de Determinación (R²)",
         "GRAPH_REG": "Gráfica de Ajuste",
-        "ERR_DATA": "ERROR: Por favor ingresa al menos 2 puntos de datos válidos."
+        "ERR_DATA": "ERROR: Por favor ingresa al menos 2 puntos de datos válidos.",
+        "METHOD_LS": "Mínimos Cuadrados",
+        "METHOD_NEWTON_LIN": "Interpolación Lineal (Newton)",
+        "INT_TITLE": "INTERPOLACIÓN LINEAL DE NEWTON",
+        "P0_LABEL": "Punto Inicial $P_0$",
+        "P1_LABEL": "Punto Final $P_1$",
+        "INT_X_VAL": "Valor a interpolar $x$:",
+        "CALC_INT_BTN": "CALCULAR INTERPOLACIÓN",
+        "INT_RES": "Resultado de la Interpolación",
+        "INT_EQ": "Sustitución en la fórmula:",
+        "ERR_X_EQUAL": "ERROR: $x_0$ y $x_1$ no pueden ser iguales (división por cero).",
     },
     "ENGLISH": {
         "TITLE": "NUMERICAL ANALYSIS PLATFORM",
@@ -175,7 +185,17 @@ LANG = {
         "COEF_CORR": "Correlation Coefficient (r)",
         "COEF_DET": "Coefficient of Determination (R²)",
         "GRAPH_REG": "Fit Graph",
-        "ERR_DATA": "ERROR: Please enter at least 2 valid data points."
+        "ERR_DATA": "ERROR: Please enter at least 2 valid data points.",
+        "METHOD_LS": "Least Squares",
+        "METHOD_NEWTON_LIN": "Linear Interpolation (Newton)",
+        "INT_TITLE": "NEWTON'S LINEAR INTERPOLATION",
+        "P0_LABEL": "Initial Point $P_0$",
+        "P1_LABEL": "Final Point $P_1$",
+        "INT_X_VAL": "Value to interpolate $x$:",
+        "CALC_INT_BTN": "CALCULATE INTERPOLATION",
+        "INT_RES": "Interpolation Result",
+        "INT_EQ": "Formula substitution:",
+        "ERR_X_EQUAL": "ERROR: $x_0$ and $x_1$ cannot be equal (division by zero)."
     }
 }
 
@@ -728,98 +748,176 @@ with tab_raices:
 # PESTAÑA 2: REGRESIÓN E INTERPOLACIÓN
 # ==========================================
 with tab_regresion:
-    st.markdown(f"### {t.get('REG_TITLE', 'REGRESIÓN LINEAL')}")
+    # Submenú interno para alternar métodos
+    metodo_tab2 = st.radio(
+        "", 
+        [t.get("METHOD_LS", "Mínimos Cuadrados"), t.get("METHOD_NEWTON_LIN", "Interpolación Lineal")], 
+        horizontal=True, 
+        label_visibility="collapsed"
+    )
     
-    col_data, col_res_reg = st.columns([1, 2], gap="large")
-    
-    with col_data:
-        st.markdown(f"**{t.get('REG_DATA', 'Ingreso de Datos')}**")
-        st.caption(t.get('REG_ADD_DEL', 'Edita, agrega o elimina filas.'))
-        
-        # Inicializar un DataFrame por defecto en el session_state para que no se borre al interactuar
-        if 'df_reg' not in st.session_state:
-            st.session_state.df_reg = pd.DataFrame({
-                "X": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-                "Y": [0.5, 2.5, 2.0, 4.0, 3.5, 6.0, 5.5]
-            })
-            
-        # El data_editor permite copiar/pegar desde Excel y agregar filas dinámicamente
-        edited_df = st.data_editor(
-            st.session_state.df_reg, 
-            num_rows="dynamic", 
-            use_container_width=True,
-            hide_index=True
-        )
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        ejecutar_reg = st.button(t.get('CALC_REG_BTN', 'CALCULAR'), use_container_width=True)
+    st.markdown("---")
 
-    with col_res_reg:
-        st.markdown(f"### {t.get('REG_RES', 'Resultados')}")
-        if ejecutar_reg:
-            # Limpiar filas vacías o con NaN
-            df_clean = edited_df.dropna()
-            n = len(df_clean)
+    # ------------------------------------------
+    # OPCIÓN A: MÍNIMOS CUADRADOS
+    # ------------------------------------------
+    if metodo_tab2 == t.get("METHOD_LS", "Mínimos Cuadrados"):
+        st.markdown(f"### {t.get('REG_TITLE', 'REGRESIÓN LINEAL (MÍNIMOS CUADRADOS)')}")
+        
+        col_data, col_res_reg = st.columns([1, 2], gap="large")
+        
+        with col_data:
+            st.markdown(f"**{t.get('REG_DATA', 'Ingreso de Datos')}**")
+            st.caption(t.get('REG_ADD_DEL', 'Haz doble clic para editar. Puedes agregar o eliminar filas en la última celda.'))
             
-            if n < 2:
-                st.error(t.get('ERR_DATA', 'Ingresa al menos 2 puntos válidos.'))
-            else:
-                x_data = df_clean["X"].values
-                y_data = df_clean["Y"].values
+            if 'df_reg' not in st.session_state:
+                st.session_state.df_reg = pd.DataFrame({
+                    "X": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+                    "Y": [0.5, 2.5, 2.0, 4.0, 3.5, 6.0, 5.5]
+                })
                 
-                # Fórmulas de Mínimos Cuadrados Lineal
-                sum_x = np.sum(x_data)
-                sum_y = np.sum(y_data)
-                sum_xy = np.sum(x_data * y_data)
-                sum_x2 = np.sum(x_data**2)
+            edited_df = st.data_editor(
+                st.session_state.df_reg, 
+                num_rows="dynamic", 
+                use_container_width=True,
+                hide_index=True
+            )
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            ejecutar_reg = st.button(t.get('CALC_REG_BTN', 'CALCULAR AJUSTE LINEAL'), use_container_width=True)
+
+        with col_res_reg:
+            st.markdown(f"### {t.get('REG_RES', 'Resultados de la Regresión')}")
+            if ejecutar_reg:
+                df_clean = edited_df.dropna()
+                n = len(df_clean)
                 
-                # Calcular coeficientes a1 (pendiente) y a0 (intersección)
-                denominador = (n * sum_x2 - sum_x**2)
-                if denominador == 0:
-                    st.error("División por cero en el cálculo de la pendiente. Revisa que las X no sean todas iguales.")
+                if n < 2:
+                    st.error(t.get('ERR_DATA', 'ERROR: Por favor ingresa al menos 2 puntos de datos válidos.'))
                 else:
-                    a1 = (n * sum_xy - sum_x * sum_y) / denominador
-                    a0 = np.mean(y_data) - a1 * np.mean(x_data)
+                    x_data = df_clean["X"].values
+                    y_data = df_clean["Y"].values
                     
-                    # Cálculo de r y R^2
-                    st_dev_tot = np.sum((y_data - np.mean(y_data))**2)
-                    st_dev_res = np.sum((y_data - (a0 + a1 * x_data))**2)
+                    sum_x = np.sum(x_data)
+                    sum_y = np.sum(y_data)
+                    sum_xy = np.sum(x_data * y_data)
+                    sum_x2 = np.sum(x_data**2)
                     
-                    r2 = 1 - (st_dev_res / st_dev_tot) if st_dev_tot != 0 else 1
-                    r = np.sqrt(abs(r2)) * (1 if a1 > 0 else -1)
+                    denominador = (n * sum_x2 - sum_x**2)
+                    if denominador == 0:
+                        st.error("División por cero en el cálculo de la pendiente. Revisa que las X no sean todas iguales.")
+                    else:
+                        a1 = (n * sum_xy - sum_x * sum_y) / denominador
+                        a0 = np.mean(y_data) - a1 * np.mean(x_data)
+                        
+                        st_dev_tot = np.sum((y_data - np.mean(y_data))**2)
+                        st_dev_res = np.sum((y_data - (a0 + a1 * x_data))**2)
+                        
+                        r2 = 1 - (st_dev_res / st_dev_tot) if st_dev_tot != 0 else 1
+                        r = np.sqrt(abs(r2)) * (1 if a1 > 0 else -1)
+                        
+                        st.info(f"**{t.get('MODEL_EQ', 'Ecuación del Modelo:')}** $y = {a1:.5f}x {'+' if a0 >= 0 else ''} {a0:.5f}$")
+                        
+                        c1, c2 = st.columns(2)
+                        c1.metric(t.get('COEF_CORR', 'Coeficiente de Correlación (r)'), f"{r:.5f}")
+                        c2.metric(t.get('COEF_DET', 'Coeficiente de Determinación (R²)'), f"{r2:.5f}")
+                        
+                        fig_reg = go.Figure()
+                        fig_reg.add_trace(go.Scatter(
+                            x=x_data, y=y_data, 
+                            mode='markers', 
+                            name='Datos Originales',
+                            marker=dict(size=10, color='#ff4d4d', symbol='circle', line=dict(width=2, color='white'))
+                        ))
+                        
+                        x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
+                        y_line = a0 + a1 * x_line
+                        fig_reg.add_trace(go.Scatter(
+                            x=x_line, y=y_line, 
+                            mode='lines', 
+                            name='Ajuste Lineal',
+                            line=dict(color='#1a73e8', width=3, dash='solid')
+                        ))
+                        
+                        fig_reg.update_layout(
+                            title=t.get('GRAPH_REG', 'Gráfica de Ajuste'),
+                            xaxis_title=t["AXIS_X"],
+                            yaxis_title=t["AXIS_Y"],
+                            hovermode="x unified",
+                            margin=dict(l=20, r=20, t=40, b=20),
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            paper_bgcolor='rgba(0,0,0,0)'
+                        )
+                        fig_reg.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                        fig_reg.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                        
+                        st.plotly_chart(fig_reg, use_container_width=True)
+            else:
+                st.info(t["INFO_START"])
+
+    # ------------------------------------------
+    # OPCIÓN B: INTERPOLACIÓN LINEAL DE NEWTON
+    # ------------------------------------------
+    else:
+        st.markdown(f"### {t.get('INT_TITLE', 'INTERPOLACIÓN LINEAL DE NEWTON')}")
+        
+        col_data, col_res_int = st.columns([1, 2], gap="large")
+        
+        with col_data:
+            st.markdown(f"**{t.get('P0_LABEL', 'Punto Inicial $P_0$')}**")
+            cx1, cy1 = st.columns(2)
+            x0_int = cx1.number_input("$x_0$", value=1.0, format="%.5f")
+            y0_int = cy1.number_input("$f(x_0)$", value=2.0, format="%.5f")
+            
+            st.markdown(f"**{t.get('P1_LABEL', 'Punto Final $P_1$')}**")
+            cx2, cy2 = st.columns(2)
+            x1_int = cx2.number_input("$x_1$", value=4.0, format="%.5f")
+            y1_int = cy2.number_input("$f(x_1)$", value=5.0, format="%.5f")
+            
+            st.markdown("---")
+            st.markdown(f"**{t.get('INT_X_VAL', 'Valor a interpolar $x$:')}**")
+            x_target = st.number_input("x", value=2.5, format="%.5f", label_visibility="collapsed")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            ejecutar_int = st.button(t.get('CALC_INT_BTN', 'CALCULAR INTERPOLACIÓN'), use_container_width=True)
+
+        with col_res_int:
+            st.markdown(f"### {t.get('INT_RES', 'Resultado')}")
+            if ejecutar_int:
+                if x0_int == x1_int:
+                    st.error(t.get('ERR_X_EQUAL', 'ERROR: $x_0$ y $x_1$ no pueden ser iguales.'))
+                else:
+                    # Cálculo de la interpolación lineal de Newton
+                    # f1(x) = f(x0) + [(f(x1) - f(x0)) / (x1 - x0)] * (x - x0)
+                    diferencia_dividida = (y1_int - y0_int) / (x1_int - x0_int)
+                    fx_target = y0_int + diferencia_dividida * (x_target - x0_int)
                     
-                    # Mostrar ecuación resultante destacada
-                    st.info(f"**{t.get('MODEL_EQ', 'Ecuación:')}** $y = {a1:.5f}x {'+' if a0 >= 0 else ''} {a0:.5f}$")
+                    st.metric(label=f"$f({x_target})$", value=f"{fx_target:.5f}")
                     
-                    # Mostrar métricas en columnas
-                    c1, c2 = st.columns(2)
-                    c1.metric(t.get('COEF_CORR', 'r'), f"{r:.5f}")
-                    c2.metric(t.get('COEF_DET', 'R²'), f"{r2:.5f}")
+                    st.info(f"**{t.get('INT_EQ', 'Sustitución:')}** $f_1({x_target}) = {y0_int} + \\left(\\frac{{{y1_int} - {y0_int}}}{{{x1_int} - {x0_int}}}\\right) ({x_target} - {x0_int})$")
                     
-                    # Generar Gráfica con Plotly
-                    fig_reg = go.Figure()
+                    # Gráfica de la interpolación
+                    fig_int = go.Figure()
                     
-                    # Añadir puntos experimentales
-                    fig_reg.add_trace(go.Scatter(
-                        x=x_data, y=y_data, 
+                    # Puntos base
+                    fig_int.add_trace(go.Scatter(
+                        x=[x0_int, x1_int], y=[y0_int, y1_int], 
+                        mode='markers+lines', 
+                        name='Intervalo de Interpolación',
+                        marker=dict(size=10, color='#1a73e8', symbol='circle'),
+                        line=dict(color='#1a73e8', width=2, dash='solid')
+                    ))
+                    
+                    # Punto interpolado
+                    fig_int.add_trace(go.Scatter(
+                        x=[x_target], y=[fx_target], 
                         mode='markers', 
-                        name='Datos Originales',
-                        marker=dict(size=10, color='#ff4d4d', symbol='circle', line=dict(width=2, color='white'))
+                        name=f'Punto Interpolado ({x_target}, {fx_target:.3f})',
+                        marker=dict(size=12, color='#ff4d4d', symbol='star')
                     ))
                     
-                    # Añadir línea de ajuste
-                    x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
-                    y_line = a0 + a1 * x_line
-                    fig_reg.add_trace(go.Scatter(
-                        x=x_line, y=y_line, 
-                        mode='lines', 
-                        name='Ajuste Lineal',
-                        line=dict(color='#1a73e8', width=3, dash='solid')
-                    ))
-                    
-                    # Aplicar el mismo estilo gráfico que usas en el módulo de raíces
-                    fig_reg.update_layout(
-                        title=t.get('GRAPH_REG', 'Gráfica de Ajuste Lineal'),
+                    fig_int.update_layout(
+                        title=t.get('GRAPH_REG', 'Gráfica'),
                         xaxis_title=t["AXIS_X"],
                         yaxis_title=t["AXIS_Y"],
                         hovermode="x unified",
@@ -827,13 +925,12 @@ with tab_regresion:
                         plot_bgcolor='rgba(0,0,0,0)',
                         paper_bgcolor='rgba(0,0,0,0)'
                     )
-                    fig_reg.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
-                    fig_reg.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    fig_int.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    fig_int.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
                     
-                    st.plotly_chart(fig_reg, use_container_width=True)
-        else:
-            st.info(t["INFO_START"])
-
+                    st.plotly_chart(fig_int, use_container_width=True)
+            else:
+                st.info(t["INFO_START"])
 # ==========================================
 # PESTAÑA 3: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
 # ==========================================
