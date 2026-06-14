@@ -156,6 +156,21 @@ LANG = {
         "ERR_N_SIMPSON": "ERROR: El método de Simpson requiere al menos n=2 intervalos.",
         "INFO_SIMPSON_EVEN": "Se aplicó **Simpson 1/3** en todo el rango porque $n$ es par.",
         "INFO_SIMPSON_ODD": "Se aplicó **Simpson 1/3** al principio y **Simpson 3/8** en los últimos 3 intervalos porque $n$ es impar.",
+        "TAB5": "ECUACIONES DIFERENCIALES",
+        "ODE_TITLE": "RESOLUCIÓN DE E.D.O.",
+        "ODE_METHOD": "Selecciona el método:",
+        "METH_EULER": "Método de Euler",
+        "METH_HEUN": "Método de Heun",
+        "METH_RALSTON": "Método de Ralston",
+        "ODE_F": "Ecuación $y' = f(x, y)$:",
+        "ODE_X0": "Valor inicial $x_0$:",
+        "ODE_Y0": "Condición inicial $y_0$:",
+        "ODE_XF": "Valor final $x_f$:",
+        "ODE_H": "Tamaño de paso $h$:",
+        "CALC_ODE_BTN": "RESOLVER EDO",
+        "ODE_RES": "Tabla de Iteraciones",
+        "ODE_GRAPH": "Trayectoria de la Solución",
+        "ERR_ODE_H": "ERROR: El tamaño de paso h debe ser mayor a 0 y caber en el intervalo.",
     },
     "ENGLISH": {
         "TITLE": "NUMERICAL ANALYSIS PLATFORM",
@@ -263,7 +278,22 @@ LANG = {
         "SIMP_TITLE": "SIMPSON'S RULE",
         "ERR_N_SIMPSON": "ERROR: Simpson's rule requires at least n=2 intervals.",
         "INFO_SIMPSON_EVEN": "Applied **Simpson 1/3** over the entire range because $n$ is even.",
-        "INFO_SIMPSON_ODD": "Applied **Simpson 1/3** initially and **Simpson 3/8** on the last 3 intervals because $n$ is odd."
+        "INFO_SIMPSON_ODD": "Applied **Simpson 1/3** initially and **Simpson 3/8** on the last 3 intervals because $n$ is odd.",
+        "TAB5": "DIFFERENTIAL EQUATIONS",
+        "ODE_TITLE": "O.D.E. SOLVER",
+        "ODE_METHOD": "Select method:",
+        "METH_EULER": "Euler's Method",
+        "METH_HEUN": "Heun's Method",
+        "METH_RALSTON": "Ralston's Method",
+        "ODE_F": "Equation $y' = f(x, y)$:",
+        "ODE_X0": "Initial value $x_0$:",
+        "ODE_Y0": "Initial condition $y_0$:",
+        "ODE_XF": "Final value $x_f$:",
+        "ODE_H": "Step size $h$:",
+        "CALC_ODE_BTN": "SOLVE ODE",
+        "ODE_RES": "Iteration Table",
+        "ODE_GRAPH": "Solution Trajectory",
+        "ERR_ODE_H": "ERROR: Step size h must be greater than 0 and fit within the interval."
     }
 }
 
@@ -462,8 +492,8 @@ if st.session_state.get("expert_mode", False):
     st.caption("⚙️ **MODO EXPERTO ACTIVADO:** Monitor de rendimiento en segundo plano listo.")
 
 # Creación de Pestañas 
-tab_raices, tab_regresion, tab_derivacion, tab_integracion, tab_info, tab_ayuda, tab_ejemplos = st.tabs([
-    t["TAB1"], t["TAB2"], t.get("TAB3", "DERIVACIÓN"), t.get("TAB4", "INTEGRACIÓN"), t["TAB_INFO"], t["TAB_HELP"], t["TAB_EXAMPLES"]
+tab_raices, tab_regresion, tab_derivacion, tab_integracion, tab_edo, tab_info, tab_ayuda, tab_ejemplos = st.tabs([
+    t["TAB1"], t["TAB2"], t.get("TAB3", "DERIVACIÓN"), t.get("TAB4", "INTEGRACIÓN"), t.get("TAB5", "E.D.O."), t["TAB_INFO"], t["TAB_HELP"], t["TAB_EXAMPLES"]
 ])
 
 x = sp.Symbol('x')
@@ -1264,7 +1294,144 @@ with tab_integracion:
             st.info(t["INFO_START"])
 
 # ==========================================
-# PESTAÑA 5: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
+# PESTAÑA 5: ECUACIONES DIFERENCIALES ORDINARIAS (EDO)
+# ==========================================
+with tab_edo:
+    st.markdown(f"### {t.get('ODE_TITLE', 'RESOLUCIÓN DE E.D.O.')}")
+    
+    # Submenú interno de métodos
+    metodo_edo = st.radio(
+        t.get("ODE_METHOD", "Selecciona el método:"), 
+        [t.get("METH_EULER", "Método de Euler"), 
+         t.get("METH_HEUN", "Método de Heun"),
+         t.get("METH_RALSTON", "Método de Ralston")], 
+        horizontal=True
+    )
+    
+    st.markdown("---")
+    
+    col_in_edo, col_out_edo = st.columns([1, 2], gap="large")
+    
+    with col_in_edo:
+        st.markdown(f"**{t.get('ODE_F', "Ecuación $y' = f(x, y)$:")}**")
+        f_str_edo = st.text_input("f(x,y)_edo", value="x + y", label_visibility="collapsed")
+        
+        c_val1, c_val2 = st.columns(2)
+        with c_val1:
+            st.markdown(f"**{t.get('ODE_X0', 'Valor $x_0$:')}**")
+            x0_edo = st.number_input("x0_edo", value=0.0, format="%.5f", label_visibility="collapsed")
+        with c_val2:
+            st.markdown(f"**{t.get('ODE_Y0', 'Condición $y_0$:')}**")
+            y0_edo = st.number_input("y0_edo", value=1.0, format="%.5f", label_visibility="collapsed")
+            
+        c_val3, c_val4 = st.columns(2)
+        with c_val3:
+            st.markdown(f"**{t.get('ODE_XF', 'Valor final $x_f$:')}**")
+            xf_edo = st.number_input("xf_edo", value=2.0, format="%.5f", label_visibility="collapsed")
+        with c_val4:
+            st.markdown(f"**{t.get('ODE_H', 'Tamaño de paso $h$:')}**")
+            h_edo = st.number_input("h_edo", value=0.5, format="%.5f", label_visibility="collapsed")
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        ejecutar_edo = st.button(t.get('CALC_ODE_BTN', 'RESOLVER EDO'), use_container_width=True)
+
+    with col_out_edo:
+        st.markdown(f"### {t.get('ODE_RES', 'Tabla de Iteraciones')}")
+        if ejecutar_edo:
+            if h_edo <= 0 or x0_edo >= xf_edo:
+                st.error(t.get('ERR_ODE_H', 'ERROR: Parámetros de rango o paso inválidos.'))
+            else:
+                try:
+                    # Se requiere declarar 'y' para funciones de dos variables
+                    y_sym = sp.Symbol('y')
+                    f_expr_edo = parse_expr(f_str_edo, transformations=transformations)
+                    f_lamb_edo = sp.lambdify((x, y_sym), f_expr_edo, 'math')
+                    
+                    # Inicialización de listas para resultados
+                    x_vals = [x0_edo]
+                    y_vals = [y0_edo]
+                    historial_edo = []
+                    
+                    # Valores actuales
+                    xi = x0_edo
+                    yi = y0_edo
+                    iteracion = 0
+                    
+                    historial_edo.append({
+                        t.get("COL_ITER", "Iteración"): iteracion,
+                        "x": f"{xi:.5f}",
+                        "y": f"{yi:.5f}"
+                    })
+                    
+                    # Bucle de cálculo
+                    while xi < xf_edo - 1e-9: # Margen de tolerancia para punto flotante
+                        # Ajustar el último paso si nos pasamos de xf
+                        h_actual = min(h_edo, xf_edo - xi)
+                        
+                        # Evaluar la derivada en el punto actual
+                        k1 = f_lamb_edo(xi, yi)
+                        
+                        if metodo_edo == t.get("METH_EULER", "Método de Euler"):
+                            # Euler Clásico
+                            yi_next = yi + k1 * h_actual
+                            
+                        elif metodo_edo == t.get("METH_HEUN", "Método de Heun"):
+                            # Heun (Euler Modificado / RK2)
+                            k2 = f_lamb_edo(xi + h_actual, yi + k1 * h_actual)
+                            yi_next = yi + (0.5 * k1 + 0.5 * k2) * h_actual
+                            
+                        elif metodo_edo == t.get("METH_RALSTON", "Método de Ralston"):
+                            # Ralston (RK2 con 3/4)
+                            k2 = f_lamb_edo(xi + 0.75 * h_actual, yi + 0.75 * k1 * h_actual)
+                            yi_next = yi + ((1/3) * k1 + (2/3) * k2) * h_actual
+                            
+                        # Actualizar variables
+                        xi += h_actual
+                        yi = yi_next
+                        iteracion += 1
+                        
+                        x_vals.append(xi)
+                        y_vals.append(yi)
+                        
+                        historial_edo.append({
+                            t.get("COL_ITER", "Iteración"): iteracion,
+                            "x": f"{xi:.5f}",
+                            "y": f"{yi:.5f}"
+                        })
+                    
+                    # Mostrar tabla de resultados
+                    st.dataframe(pd.DataFrame(historial_edo), use_container_width=True, hide_index=True)
+                    
+                    st.markdown(f"### {t.get('ODE_GRAPH', 'Trayectoria de la Solución')}")
+                    # Gráfica de la solución
+                    fig_edo = go.Figure()
+                    
+                    fig_edo.add_trace(go.Scatter(
+                        x=x_vals, y=y_vals, 
+                        mode='lines+markers', 
+                        name=f'Solución ({metodo_edo})',
+                        line=dict(color='#1a73e8', width=3),
+                        marker=dict(size=8, color='#ff4d4d', symbol='circle')
+                    ))
+                    
+                    fig_edo.update_layout(
+                        title=f"Aproximación Numérica: $y' = {f_str_edo}$",
+                        xaxis_title="Eje X", yaxis_title="Eje Y",
+                        hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20),
+                        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)'
+                    )
+                    fig_edo.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    fig_edo.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)', zeroline=True)
+                    
+                    st.plotly_chart(fig_edo, use_container_width=True)
+                    
+                except Exception as e:
+                    st.error(f"ERROR TÉCNICO DETECTADO: {e}")
+        else:
+            st.info(t["INFO_START"])
+
+# ==========================================
+# PESTAÑA 6: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
 # ==========================================
 with tab_ayuda:
     st.markdown(f"### {t['TAB_INFO']}")
