@@ -71,7 +71,11 @@ LANG = {
         "COMP_GRAPH": "VER GRÁFICA COMPARATIVA DE RAÍCES",
         "NO_ROOTS": "No se encontraron raíces válidas para graficar.",
         "ERR_SYNTAX": "ERROR en la sintaxis de las funciones o división por cero detectada. Revisa los datos ingresados.",
-        "INFO_START": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'CALCULAR RAÍCES'.",
+        "INFO_START_ROOTS": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'CALCULAR RAÍCES'.",
+        "INFO_START_REG": "INGRESA LOS DATOS A LA IZQUIERDA Y PRESIONA EL BOTÓN DE CÁLCULO.",
+        "INFO_START_DERIV": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'CALCULAR DERIVADAS'.",
+        "INFO_START_INTG": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'CALCULAR ÁREA'.",
+        "INFO_START_ODE": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'RESOLVER EDO'.",
         "CONSTRUCTION": "MÓDULO EN CONSTRUCCIÓN.",
         "ERR_OPPOSITE": "ERROR: $f(x_l)$ y $f(x_u)$ no tienen signos opuestos.",
         "ERR_EVAL": "ERROR: Fallo al evaluar los límites en la función.",
@@ -194,7 +198,11 @@ LANG = {
         "COMP_GRAPH": "VIEW COMPARATIVE ROOTS GRAPH",
         "NO_ROOTS": "No valid roots found to plot.",
         "ERR_SYNTAX": "ERROR in function syntax or division by zero detected. Check the input data.",
-        "INFO_START": "ENTER PARAMETERS ON THE LEFT AND PRESS 'CALCULATE ROOTS'.",
+        "INFO_START_ROOTS": "ENTER PARAMETERS ON THE LEFT AND PRESS 'CALCULATE ROOTS'.",
+        "INFO_START_REG": "ENTER DATA ON THE LEFT AND PRESS THE CALCULATE BUTTON.",
+        "INFO_START_DERIV": "ENTER PARAMETERS ON THE LEFT AND PRESS 'CALCULATE DERIVATIVES'.",
+        "INFO_START_INTG": "ENTER PARAMETERS ON THE LEFT AND PRESS 'CALCULATE AREA'.",
+        "INFO_START_ODE": "ENTER PARAMETERS ON THE LEFT AND PRESS 'SOLVE ODE'.",
         "CONSTRUCTION": "MODULE UNDER CONSTRUCTION.",
         "ERR_OPPOSITE": "ERROR: $f(x_l)$ and $f(x_u)$ do not have opposite signs.",
         "ERR_EVAL": "ERROR: Failed to evaluate limits in the function.",
@@ -840,7 +848,7 @@ with tab_raices:
             except Exception as e:
                 st.error(t["ERR_SYNTAX"])
         else:
-            st.info(t["INFO_START"])
+            st.info(t["INFO_START_ROOTS"])
 
 # ==========================================
 # PESTAÑA 2: REGRESIÓN E INTERPOLACIÓN
@@ -914,7 +922,7 @@ with tab_regresion:
                         fig_reg.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                         st.plotly_chart(fig_reg, use_container_width=True)
             else:
-                st.info(t["INFO_START"])
+                st.info(t["INFO_START_REG"])
 
     # ------------------------------------------
     # OPCIÓN B: INTERPOLACIÓN LINEAL DE NEWTON
@@ -959,7 +967,7 @@ with tab_regresion:
                     fig_int.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                     st.plotly_chart(fig_int, use_container_width=True)
             else:
-                st.info(t["INFO_START"])
+                st.info(t["INFO_START_REG"])
 
     # ------------------------------------------
     # OPCIÓN C: INTERPOLACIÓN DE LAGRANGE
@@ -1050,7 +1058,7 @@ with tab_regresion:
                     )
                     st.plotly_chart(fig_lag, use_container_width=True)
             else:
-                st.info(t["INFO_START"])
+                st.info(t["INFO_START_REG"])
 
 # ==========================================
 # PESTAÑA 3: DERIVACIÓN NUMÉRICA (DIFERENCIAS FINITAS)
@@ -1149,7 +1157,7 @@ with tab_derivacion:
                 except Exception as e:
                     st.error(t.get('ERR_SYNTAX', 'ERROR: Sintaxis inválida o función no soportada.'))
         else:
-            st.info(t["INFO_START"])
+            st.info(t["INFO_START_DERIV"])
 
 # ==========================================
 # PESTAÑA 4: INTEGRACIÓN NUMÉRICA (TRAPECIOS)
@@ -1291,7 +1299,7 @@ with tab_integracion:
                 except Exception as e:
                     st.error(f"ERROR TÉCNICO DETECTADO: {e}")
         else:
-            st.info(t["INFO_START"])
+            st.info(t["INFO_START_INTG"])
 
 # ==========================================
 # PESTAÑA 5: ECUACIONES DIFERENCIALES ORDINARIAS (EDO)
@@ -1428,7 +1436,7 @@ with tab_edo:
                 except Exception as e:
                     st.error(f"ERROR TÉCNICO DETECTADO: {e}")
         else:
-            st.info(t["INFO_START"])
+            st.info(t["INFO_START_ODE"])
 
 # ==========================================
 # PESTAÑA 6: AYUDA FUSIONADA (Info, Ayuda, Ejemplos)
