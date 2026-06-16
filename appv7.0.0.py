@@ -389,7 +389,7 @@ st.markdown("""
         border: 1px solid rgba(128, 128, 128, 0.3); background-color: rgba(128, 128, 128, 0.05);
     }
     div[data-testid="stTextInput"] input:focus {
-        border-color: #e0a6be; box-shadow: 0 4px 10px rgba(224, 166, 190, 0.2);
+        border-color: #7c6dd9; box-shadow: 0 4px 10px rgba(124, 109, 217, 0.2);
     }
     div[data-testid="stNumberInputContainer"] { border-radius: 10px !important; overflow: hidden; }
     div[data-testid="stNumberInput"] button:first-of-type { color: #ff4d4d !important; transition: all 0.2s ease; }
@@ -401,11 +401,11 @@ st.markdown("""
     div[data-testid="stNumberInput"] button:last-of-type:hover { background-color: rgba(0, 204, 102, 0.15) !important; color: #00994d !important; }
     div[data-testid="stNumberInput"] button:last-of-type:hover svg { fill: #00994d !important; }
     div[data-testid="stButton"] button {
-        border-radius: 15px; background-color: #e0a6be; color: white;
+        border-radius: 15px; background-color: #7c6dd9; color: white;
         font-weight: bold; transition: all 0.3s ease; border: none; padding: 10px 20px;
     }
     div[data-testid="stButton"] button:hover {
-        background-color: #c989a1; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(224, 166, 190, 0.4);
+        background-color: #5a4eb3; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(124, 109, 217, 0.4);
     }
     div[data-testid="stMetric"] {
         background-color: rgba(128, 128, 128, 0.05); padding: 15px; border-radius: 12px;
@@ -414,9 +414,9 @@ st.markdown("""
     div[data-testid="stMetric"]:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
     .math-preview { padding: 10px 0px; margin-bottom: 5px; display: flex; justify-content: center; }
     div[data-testid="stExpander"] details summary {
-        background-color: #e0a6be !important; color: #000000 !important; border-radius: 8px; font-weight: 600;
+        background-color: #7c6dd9 !important; color: #000000 !important; border-radius: 8px; font-weight: 600;
     }
-    div[data-testid="stExpander"] details summary:hover { background-color: #c989a1 !important; }
+    div[data-testid="stExpander"] details summary:hover { background-color: #5a4eb3 !important; }
     div[data-testid="stExpander"] details summary p { font-family: 'Samsung Sharp Sans', -apple-system, sans-serif !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -531,7 +531,7 @@ def crear_grafica(func_lambdificada, titulo, raices_encontradas=None):
             y_vals[i] = np.nan
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name=titulo, line=dict(color='#e0a6be', width=2)))
+    fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name=titulo, line=dict(color='#7c6dd9', width=2)))
     
     fig.update_layout(
         title=titulo,
@@ -926,7 +926,7 @@ with tab_regresion:
                         fig_reg.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', name='Datos', marker=dict(size=10, color='#ff4d4d')))
                         
                         x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
-                        fig_reg.add_trace(go.Scatter(x=x_line, y=a0 + a1 * x_line, mode='lines', name='Ajuste', line=dict(color='#e0a6be', width=3)))
+                        fig_reg.add_trace(go.Scatter(x=x_line, y=a0 + a1 * x_line, mode='lines', name='Ajuste', line=dict(color='#7c6dd9', width=3)))
                         
                         fig_reg.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                         st.plotly_chart(fig_reg, use_container_width=True)
@@ -971,7 +971,7 @@ with tab_regresion:
                     st.info(f"**{t.get('INT_EQ', 'Sustitución:')}** f₁({x_target}) = {y0_int} + (({y1_int} - {y0_int}) / ({x1_int} - {x0_int})) * ({x_target} - {x0_int})")
                     
                     fig_int = go.Figure()
-                    fig_int.add_trace(go.Scatter(x=[x0_int, x1_int], y=[y0_int, y1_int], mode='markers+lines', name='Intervalo', marker=dict(size=10, color='#e0a6be')))
+                    fig_int.add_trace(go.Scatter(x=[x0_int, x1_int], y=[y0_int, y1_int], mode='markers+lines', name='Intervalo', marker=dict(size=10, color='#7c6dd9')))
                     fig_int.add_trace(go.Scatter(x=[x_target], y=[fx_target], mode='markers', name='Punto Interpolado', marker=dict(size=12, color='#ff4d4d', symbol='star')))
                     fig_int.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                     st.plotly_chart(fig_int, use_container_width=True)
@@ -1038,7 +1038,7 @@ with tab_regresion:
                         x=x_vals, y=y_vals, 
                         mode='markers', 
                         name='Puntos Conocidos',
-                        marker=dict(size=10, color='#e0a6be', symbol='circle')
+                        marker=dict(size=10, color='#7c6dd9', symbol='circle')
                     ))
                     
                     # Punto interpolado
@@ -1057,7 +1057,7 @@ with tab_regresion:
                         x=x_rango, y=y_rango, 
                         mode='lines', 
                         name=f'Polinomio P(x)',
-                        line=dict(color='rgba(224, 166, 190, 0.5)', width=2, dash='dot')
+                        line=dict(color='rgba(124, 109, 217, 0.5)', width=2, dash='dot')
                     ))
                     
                     fig_lag.update_layout(
@@ -1139,7 +1139,7 @@ with tab_derivacion:
                     rango_y = [f_lamb_df(val) for val in rango_x]
                     
                     # Curva principal
-                    fig_df.add_trace(go.Scatter(x=rango_x, y=rango_y, mode='lines', name='Curva f(x)', line=dict(color='#e0a6be', width=3)))
+                    fig_df.add_trace(go.Scatter(x=rango_x, y=rango_y, mode='lines', name='Curva f(x)', line=dict(color='#7c6dd9', width=3)))
                     
                     # Línea Tangente Exacta
                     y_tangente = exact_val * (rango_x - xi) + f_xi
@@ -1280,7 +1280,7 @@ with tab_integracion:
                     fig_intg.add_trace(go.Scatter(
                         x=rango_x_curva, y=rango_y_curva, 
                         mode='lines', name='Curva f(x)', 
-                        line=dict(color='#e0a6be', width=3)
+                        line=dict(color='#7c6dd9', width=3)
                     ))
                     
                     # Relleno del área aproximada
@@ -1427,7 +1427,7 @@ with tab_edo:
                         x=x_vals, y=y_vals, 
                         mode='lines+markers', 
                         name=f'Solución ({metodo_edo})',
-                        line=dict(color='#e0a6be', width=3),
+                        line=dict(color='#7c6dd9', width=3),
                         marker=dict(size=8, color='#ff4d4d', symbol='circle')
                     ))
                     
