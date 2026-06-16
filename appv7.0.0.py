@@ -7,12 +7,10 @@ import plotly.graph_objects as go
 import time
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application, convert_xor
 
-import base64 # Agrega esto junto a tus otras importaciones (import streamlit as st, etc.)
-
 # ==========================================
 # CONFIGURACIÓN DE PÁGINA (Debe ser la primera instrucción)
 # ==========================================
-st.set_page_config(page_title="MÉTODOS NUMÉRICOS", layout="wide")
+st.set_page_config(page_title="Itera Studio", layout="wide")
 
 # ==========================================
 # INYECCIÓN DE IMAGEN DE FONDO
@@ -36,18 +34,11 @@ def agregar_fondo_local(ruta_imagen):
     )
 
 # Llama a la función con el nombre exacto de tu archivo de imagen
-# (Asegúrate de que la imagen esté en la misma carpeta que este script)
 agregar_fondo_local("mikurescaled.jpeg")
-
-# ==========================================
-# CONFIGURACIÓN DE PÁGINA (Debe ser la primera instrucción)
-# ==========================================
-st.set_page_config(page_title="MÉTODOS NUMÉRICOS", layout="wide")
 
 # ==========================================
 # GESTIÓN DE ACCIONES Y PARÁMETROS DE URL
 # ==========================================
-# Esto reemplaza al JavaScript. Escucha los clics de la barra superior.
 params = st.query_params
 
 if "action" in params:
@@ -79,11 +70,11 @@ else:
     idioma_seleccionado = "ESPAÑOL"
 
 # ==========================================
-# DICCIONARIO DE IDIOMAS (Limpieza de LaTeX / Uso de Unicode)
+# DICCIONARIO DE IDIOMAS 
 # ==========================================
 LANG = {
     "ESPAÑOL": {
-        "TITLE": "PLATAFORMA DE ANÁLISIS NUMÉRICO",
+        "TITLE": "ITERA STUDIO",
         "TAB1": "SOLUCIÓN DE ECUACIONES",
         "TAB2": "REGRESIÓN E INTERPOLACIÓN",
         "TAB_INFO": "INFORMACIÓN",
@@ -133,9 +124,9 @@ LANG = {
         "CURVE_F": "Curva f(x) y Puntos Encontrados",
         "AXIS_X": "EJE X",
         "AXIS_Y": "EJE Y",
-        "INFO_TEXT": "Esta plataforma permite encontrar las raíces de ecuaciones algebraicas y trascendentes mediante cinco métodos numéricos clásicos ejecutados de forma simultánea. El objetivo es comparar la velocidad de convergencia y la precisión de cada algoritmo.",
-        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para e^x, `log(x)` para el logaritmo natural.",
-        "HELP_PARAMS": "### PARÁMETROS\n* **xₗ y xᵤ:** Requeridos para Bisección y Falsa Posición (deben encerrar la raíz).\n* **x₀:** Requerido para Newton-Raphson y Punto Fijo como valor inicial de búsqueda.\n* **ε:** El criterio de detención. El cálculo se detendrá cuando el error absoluto sea menor a este valor.",
+        "INFO_TEXT": "Esta herramienta interactiva te permite explorar los métodos numéricos clásicos aplicados a la ingeniería y ciencias exactas. No solo calcula raíces de ecuaciones, sino que también abarca regresión, interpolación, derivación, integración y ecuaciones diferenciales ordinarias (E.D.O.). El objetivo es que puedas comparar la precisión, velocidad y comportamiento de cada algoritmo mediante visualizaciones claras y tablas iterativas.",
+        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para e^x, `log(x)` para el logaritmo natural.\n* **Múltiples variables:** Para las E.D.O., puedes usar `x` e `y` juntas (ej. `x + 2y` o `x*y`).",
+        "HELP_PARAMS": "### PARÁMETROS PRINCIPALES\n**Módulo de Raíces:**\n* **xₗ y xᵤ:** Límites que encierran la raíz (Bisección y Falsa Posición).\n* **x₀:** Valor inicial de búsqueda (Newton-Raphson y Punto Fijo).\n* **ε:** Tolerancia. El cálculo se detiene cuando el error es menor a este valor.\n\n**Otros Módulos:**\n* **P₀ y P₁ / Puntos (x,y):** Coordenadas base para trazar los ajustes de regresión o interpolación.\n* **h:** Tamaño de paso utilizado para el cálculo de Derivadas y E.D.O.\n* **a y b:** Límites inferior y superior para delimitar el área de Integración.\n* **n:** Número de intervalos o particiones para los métodos de Integración.",
         "EX_1_TITLE": "Ejemplo 1: Polinomio Algebraico",
         "EX_2_TITLE": "Ejemplo 2: Ecuación Trascendente",
         "EX_3_TITLE": "Ejemplo 3: Convergencia de Punto Fijo",
@@ -210,7 +201,7 @@ LANG = {
         "ERR_ODE_H": "ERROR: El tamaño de paso h debe ser mayor a 0 y caber en el intervalo.",
     },
     "ENGLISH": {
-        "TITLE": "NUMERICAL ANALYSIS PLATFORM",
+        "TITLE": "ITERA STUDIO",
         "TAB1": "EQUATION SOLVING",
         "TAB2": "REGRESSION & INTERPOLATION",
         "TAB_INFO": "INFO",
@@ -260,9 +251,9 @@ LANG = {
         "CURVE_F": "Curve f(x) and Found Points",
         "AXIS_X": "X AXIS",
         "AXIS_Y": "Y AXIS",
-        "INFO_TEXT": "This platform allows finding the roots of algebraic and transcendental equations using five classic numerical methods executed simultaneously. The objective is to compare the convergence speed and precision of each algorithm for the same mathematical function.",
-        "HELP_SYNTAX": "### FUNCTION SYNTAX\nThe calculator interprets natural mathematical text. You can use:\n* **Powers:** `x^2` or `x**2`\n* **Implicit multiplication:** `2x` is automatically parsed as `2*x`\n* **Fractions:** `(x+1)/2`\n* **Trigonometric functions:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponentials and logarithms:** `exp(x)` for e^x, `log(x)` for natural logarithm.",
-        "HELP_PARAMS": "### PARAMETERS\n* **xₗ and xᵤ:** Required for Bisection and False Position (must enclose the root).\n* **x₀:** Required for Newton-Raphson and Fixed Point as the initial search value.\n* **ε:** The stopping criterion. Calculation stops when the absolute error is less than this value.",
+        "INFO_TEXT": "This interactive tool allows you to explore classic numerical methods applied to engineering and exact sciences. It not only calculates roots of equations, but also covers regression, interpolation, differentiation, integration, and ordinary differential equations (ODEs). The objective is to let you compare the precision, speed, and behavior of each algorithm through clear visualizations and iterative tables.",
+        "HELP_SYNTAX": "### FUNCTION SYNTAX\nThe calculator interprets natural mathematical text. You can use:\n* **Powers:** `x^2` or `x**2`\n* **Implicit multiplication:** `2x` is automatically parsed as `2*x`\n* **Fractions:** `(x+1)/2`\n* **Trigonometric functions:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponentials and logarithms:** `exp(x)` for e^x, `log(x)` for natural logarithm.\n* **Multiple variables:** For ODEs, you can use `x` and `y` together (e.g. `x + 2y` or `x*y`).",
+        "HELP_PARAMS": "### MAIN PARAMETERS\n**Roots Module:**\n* **xₗ and xᵤ:** Limits that enclose the root (Bisection and False Position).\n* **x₀:** Initial search value (Newton-Raphson and Fixed Point).\n* **ε:** Tolerance. Calculation stops when the error is less than this value.\n\n**Other Modules:**\n* **P₀ and P₁ / Points (x,y):** Base coordinates to draw regression or interpolation fits.\n* **h:** Step size used for Derivatives and ODE calculations.\n* **a and b:** Lower and upper limits to bound the Integration area.\n* **n:** Number of intervals or partitions for Integration methods.",
         "EX_1_TITLE": "Example 1: Algebraic Polynomial",
         "EX_2_TITLE": "Example 2: Transcendental Equation",
         "EX_3_TITLE": "Example 3: Fixed Point Convergence",
@@ -398,7 +389,7 @@ st.markdown("""
         border: 1px solid rgba(128, 128, 128, 0.3); background-color: rgba(128, 128, 128, 0.05);
     }
     div[data-testid="stTextInput"] input:focus {
-        border-color: #1a73e8; box-shadow: 0 4px 10px rgba(26, 115, 232, 0.1);
+        border-color: #e0a6be; box-shadow: 0 4px 10px rgba(224, 166, 190, 0.2);
     }
     div[data-testid="stNumberInputContainer"] { border-radius: 10px !important; overflow: hidden; }
     div[data-testid="stNumberInput"] button:first-of-type { color: #ff4d4d !important; transition: all 0.2s ease; }
@@ -410,11 +401,11 @@ st.markdown("""
     div[data-testid="stNumberInput"] button:last-of-type:hover { background-color: rgba(0, 204, 102, 0.15) !important; color: #00994d !important; }
     div[data-testid="stNumberInput"] button:last-of-type:hover svg { fill: #00994d !important; }
     div[data-testid="stButton"] button {
-        border-radius: 15px; background-color: #1a73e8; color: white;
+        border-radius: 15px; background-color: #e0a6be; color: white;
         font-weight: bold; transition: all 0.3s ease; border: none; padding: 10px 20px;
     }
     div[data-testid="stButton"] button:hover {
-        background-color: #1557b0; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(26, 115, 232, 0.3);
+        background-color: #c989a1; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(224, 166, 190, 0.4);
     }
     div[data-testid="stMetric"] {
         background-color: rgba(128, 128, 128, 0.05); padding: 15px; border-radius: 12px;
@@ -423,9 +414,9 @@ st.markdown("""
     div[data-testid="stMetric"]:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
     .math-preview { padding: 10px 0px; margin-bottom: 5px; display: flex; justify-content: center; }
     div[data-testid="stExpander"] details summary {
-        background-color: #88C7F2 !important; color: #000000 !important; border-radius: 8px; font-weight: 600;
+        background-color: #e0a6be !important; color: #000000 !important; border-radius: 8px; font-weight: 600;
     }
-    div[data-testid="stExpander"] details summary:hover { background-color: #7ab3da !important; }
+    div[data-testid="stExpander"] details summary:hover { background-color: #c989a1 !important; }
     div[data-testid="stExpander"] details summary p { font-family: 'Samsung Sharp Sans', -apple-system, sans-serif !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -466,7 +457,15 @@ st.markdown("""
 </style>
 
 <div class="steam-top-bar">
-    <div class="steam-logo">Universidad Veracruzana</div>
+    <div class="steam-menu">
+        <div class="steam-menu-item hamburguesa">&#9776;
+            <div class="steam-dropdown">
+                <a href="?lang=es" target="_self">Español</a>
+                <a href="?lang=en" target="_self">English</a>
+            </div>
+        </div>
+    </div>
+    <div class="steam-logo">Itera Studio</div>
     <div class="steam-right">
         <div class="steam-menu-item steam-profile">Azael
             <div class="steam-dropdown" style="left: auto; right: 0;">
@@ -532,7 +531,7 @@ def crear_grafica(func_lambdificada, titulo, raices_encontradas=None):
             y_vals[i] = np.nan
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name=titulo, line=dict(color='#1a73e8', width=2)))
+    fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name=titulo, line=dict(color='#e0a6be', width=2)))
     
     fig.update_layout(
         title=titulo,
@@ -927,7 +926,7 @@ with tab_regresion:
                         fig_reg.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', name='Datos', marker=dict(size=10, color='#ff4d4d')))
                         
                         x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
-                        fig_reg.add_trace(go.Scatter(x=x_line, y=a0 + a1 * x_line, mode='lines', name='Ajuste', line=dict(color='#1a73e8', width=3)))
+                        fig_reg.add_trace(go.Scatter(x=x_line, y=a0 + a1 * x_line, mode='lines', name='Ajuste', line=dict(color='#e0a6be', width=3)))
                         
                         fig_reg.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                         st.plotly_chart(fig_reg, use_container_width=True)
@@ -972,7 +971,7 @@ with tab_regresion:
                     st.info(f"**{t.get('INT_EQ', 'Sustitución:')}** f₁({x_target}) = {y0_int} + (({y1_int} - {y0_int}) / ({x1_int} - {x0_int})) * ({x_target} - {x0_int})")
                     
                     fig_int = go.Figure()
-                    fig_int.add_trace(go.Scatter(x=[x0_int, x1_int], y=[y0_int, y1_int], mode='markers+lines', name='Intervalo', marker=dict(size=10, color='#1a73e8')))
+                    fig_int.add_trace(go.Scatter(x=[x0_int, x1_int], y=[y0_int, y1_int], mode='markers+lines', name='Intervalo', marker=dict(size=10, color='#e0a6be')))
                     fig_int.add_trace(go.Scatter(x=[x_target], y=[fx_target], mode='markers', name='Punto Interpolado', marker=dict(size=12, color='#ff4d4d', symbol='star')))
                     fig_int.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                     st.plotly_chart(fig_int, use_container_width=True)
@@ -1039,7 +1038,7 @@ with tab_regresion:
                         x=x_vals, y=y_vals, 
                         mode='markers', 
                         name='Puntos Conocidos',
-                        marker=dict(size=10, color='#1a73e8', symbol='circle')
+                        marker=dict(size=10, color='#e0a6be', symbol='circle')
                     ))
                     
                     # Punto interpolado
@@ -1058,7 +1057,7 @@ with tab_regresion:
                         x=x_rango, y=y_rango, 
                         mode='lines', 
                         name=f'Polinomio P(x)',
-                        line=dict(color='rgba(26, 115, 232, 0.5)', width=2, dash='dot')
+                        line=dict(color='rgba(224, 166, 190, 0.5)', width=2, dash='dot')
                     ))
                     
                     fig_lag.update_layout(
@@ -1140,7 +1139,7 @@ with tab_derivacion:
                     rango_y = [f_lamb_df(val) for val in rango_x]
                     
                     # Curva principal
-                    fig_df.add_trace(go.Scatter(x=rango_x, y=rango_y, mode='lines', name='Curva f(x)', line=dict(color='#1a73e8', width=3)))
+                    fig_df.add_trace(go.Scatter(x=rango_x, y=rango_y, mode='lines', name='Curva f(x)', line=dict(color='#e0a6be', width=3)))
                     
                     # Línea Tangente Exacta
                     y_tangente = exact_val * (rango_x - xi) + f_xi
@@ -1281,7 +1280,7 @@ with tab_integracion:
                     fig_intg.add_trace(go.Scatter(
                         x=rango_x_curva, y=rango_y_curva, 
                         mode='lines', name='Curva f(x)', 
-                        line=dict(color='#1a73e8', width=3)
+                        line=dict(color='#e0a6be', width=3)
                     ))
                     
                     # Relleno del área aproximada
@@ -1428,7 +1427,7 @@ with tab_edo:
                         x=x_vals, y=y_vals, 
                         mode='lines+markers', 
                         name=f'Solución ({metodo_edo})',
-                        line=dict(color='#1a73e8', width=3),
+                        line=dict(color='#e0a6be', width=3),
                         marker=dict(size=8, color='#ff4d4d', symbol='circle')
                     ))
                     
