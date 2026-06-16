@@ -46,7 +46,7 @@ else:
     idioma_seleccionado = "ESPAÑOL"
 
 # ==========================================
-# DICCIONARIO DE IDIOMAS (LaTeX Corregido)
+# DICCIONARIO DE IDIOMAS (Unicode y LaTeX Corregido)
 # ==========================================
 LANG = {
     "ESPAÑOL": {
@@ -91,11 +91,11 @@ LANG = {
         "METH_SEC": "SECANTE",
         "METH_PF": "PUNTO FIJO",
         "COL_ITER": "Iteración",
-        "COL_XL": "$x_l$",
-        "COL_XU": "$x_u$",
-        "COL_XR": "$x_r$",
-        "COL_XI": "$x_i$",
-        "COL_XSIG": "x_{i+1}",
+        "COL_XL": "xₗ",
+        "COL_XU": "xᵤ",
+        "COL_XR": "xᵣ",
+        "COL_XI": "xᵢ",
+        "COL_XSIG": "xᵢ₊₁",
         "COL_ERR": "Error Absoluto",
         "CURVE_F": "Curva f(x) y Puntos Encontrados",
         "AXIS_X": "EJE X",
@@ -218,11 +218,11 @@ LANG = {
         "METH_SEC": "SECANT",
         "METH_PF": "FIXED POINT",
         "COL_ITER": "Iteration",
-        "COL_XL": "$x_l$",
-        "COL_XU": "$x_u$",
-        "COL_XR": "$x_r$",
-        "COL_XI": "$x_i$",
-        "COL_XSIG": "x_{i+1}",
+        "COL_XL": "xₗ",
+        "COL_XU": "xᵤ",
+        "COL_XR": "xᵣ",
+        "COL_XI": "xᵢ",
+        "COL_XSIG": "xᵢ₊₁",
         "COL_ERR": "Absolute Error",
         "CURVE_F": "Curve f(x) and Found Points",
         "AXIS_X": "X AXIS",
