@@ -37,7 +37,7 @@ def agregar_fondo_local(ruta_imagen):
 
 # Llama a la función con el nombre exacto de tu archivo de imagen
 # (Asegúrate de que la imagen esté en la misma carpeta que este script)
-agregar_fondo_local("mikurescaled.png")
+agregar_fondo_local("mikurescaled.jpeg")
 
 # ==========================================
 # CONFIGURACIÓN DE PÁGINA (Debe ser la primera instrucción)
