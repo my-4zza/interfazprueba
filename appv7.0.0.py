@@ -124,8 +124,8 @@ LANG = {
         "CURVE_F": "Curva f(x) y Puntos Encontrados",
         "AXIS_X": "EJE X",
         "AXIS_Y": "EJE Y",
-        "INFO_TEXT": "Esta herramienta interactiva te permite explorar los métodos numéricos clásicos aplicados a la ingeniería y ciencias exactas. No solo calcula raíces de ecuaciones, sino que también abarca regresión, interpolación, derivación, integración y ecuaciones diferenciales ordinarias (E.D.O.). El objetivo es que puedas comparar la precisión, velocidad y comportamiento de cada algoritmo mediante visualizaciones claras y tablas iterativas.",
-        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para e^x, `log(x)` para el logaritmo natural.\n* **Múltiples variables:** Para las E.D.O., puedes usar `x` e `y` juntas (ej. `x + 2y` o `x*y`).",
+        "INFO_TEXT": "Somos estudiantes de la Universidad Veracruzana y desarrolladmos esta herramienta interactiva que te permite explorar los métodos numéricos clásicos aplicados a la ingeniería y ciencias exactas. No solo calcula raíces de ecuaciones, sino que también abarca regresión, interpolación, derivación, integración y ecuaciones diferenciales ordinarias (E.D.O.). El objetivo es que puedas comparar la precisión, velocidad y comportamiento de cada algoritmo mediante visualizaciones claras y tablas iterativas.",
+        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para e^x, `log(x)` para el logaritmo natural.\n* **Múltiples variables:** Para las E.D.O., puedes usar `x` e y juntas (ej. `x + 2y` o `x*y`).",
         "HELP_PARAMS": "### PARÁMETROS PRINCIPALES\n**Módulo de Raíces:**\n* **xₗ y xᵤ:** Límites que encierran la raíz (Bisección y Falsa Posición).\n* **x₀:** Valor inicial de búsqueda (Newton-Raphson y Punto Fijo).\n* **ε:** Tolerancia. El cálculo se detiene cuando el error es menor a este valor.\n\n**Otros Módulos:**\n* **P₀ y P₁ / Puntos (x,y):** Coordenadas base para trazar los ajustes de regresión o interpolación.\n* **h:** Tamaño de paso utilizado para el cálculo de Derivadas y E.D.O.\n* **a y b:** Límites inferior y superior para delimitar el área de Integración.\n* **n:** Número de intervalos o particiones para los métodos de Integración.",
         "EX_1_TITLE": "Ejemplo 1: Polinomio Algebraico",
         "EX_2_TITLE": "Ejemplo 2: Ecuación Trascendente",
@@ -251,7 +251,7 @@ LANG = {
         "CURVE_F": "Curve f(x) and Found Points",
         "AXIS_X": "X AXIS",
         "AXIS_Y": "Y AXIS",
-        "INFO_TEXT": "This interactive tool allows you to explore classic numerical methods applied to engineering and exact sciences. It not only calculates roots of equations, but also covers regression, interpolation, differentiation, integration, and ordinary differential equations (ODEs). The objective is to let you compare the precision, speed, and behavior of each algorithm through clear visualizations and iterative tables.",
+        "INFO_TEXT": "We are students at the University of Veracruz and we developed this interactive tool that allows you to explore classical numerical methods applied to engineering and the exact sciences. It not only calculates roots of equations, but also covers regression, interpolation, differentiation, integration, and ordinary differential equations (ODEs). The goal is for you to be able to compare the accuracy, speed, and behavior of each algorithm through clear visualizations and iterative tables.",
         "HELP_SYNTAX": "### FUNCTION SYNTAX\nThe calculator interprets natural mathematical text. You can use:\n* **Powers:** `x^2` or `x**2`\n* **Implicit multiplication:** `2x` is automatically parsed as `2*x`\n* **Fractions:** `(x+1)/2`\n* **Trigonometric functions:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponentials and logarithms:** `exp(x)` for e^x, `log(x)` for natural logarithm.\n* **Multiple variables:** For ODEs, you can use `x` and `y` together (e.g. `x + 2y` or `x*y`).",
         "HELP_PARAMS": "### MAIN PARAMETERS\n**Roots Module:**\n* **xₗ and xᵤ:** Limits that enclose the root (Bisection and False Position).\n* **x₀:** Initial search value (Newton-Raphson and Fixed Point).\n* **ε:** Tolerance. Calculation stops when the error is less than this value.\n\n**Other Modules:**\n* **P₀ and P₁ / Points (x,y):** Base coordinates to draw regression or interpolation fits.\n* **h:** Step size used for Derivatives and ODE calculations.\n* **a and b:** Lower and upper limits to bound the Integration area.\n* **n:** Number of intervals or partitions for Integration methods.",
         "EX_1_TITLE": "Example 1: Algebraic Polynomial",
@@ -448,11 +448,6 @@ st.markdown("""
 }
 .steam-dropdown a:hover { background-color: #2a475e; color: #ffffff; }
 .steam-right { margin-left: auto; display: flex; align-items: center; }
-.steam-profile {
-    color: #66c0f4; font-weight: 500; cursor: pointer; display: flex;
-    align-items: center; gap: 5px; padding: 5px 10px; border-radius: 3px; transition: background 0.2s;
-}
-.steam-profile:hover { background-color: #2a475e; color: #ffffff; }
 .hamburguesa { font-size: 16px; font-weight: 800; margin-right: 15px; }
 </style>
 
@@ -466,13 +461,6 @@ st.markdown("""
         </div>
     </div>
     <div class="steam-logo">Itera Studio</div>
-    <div class="steam-right">
-        <div class="steam-menu-item steam-profile">Azael
-            <div class="steam-dropdown" style="left: auto; right: 0;">
-                <a href="?action=expert" target="_self">Activar/Desactivar Modo Experto</a>
-            </div>
-        </div>
-    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -480,7 +468,7 @@ st.markdown("""
 # NOTIFICACIÓN Y GUÍA DE INICIO (Nativo)
 # ==========================================
 if "tutorial_seen" not in st.session_state:
-    st.toast('👋 ¡Hola! Si eres nuevo, ve al menú **Ayuda > Ver Guía de Inicio Rápido** para aprender a usar la plataforma.', icon='🎓')
+    st.toast('¡Hola! Si eres nuevo, ve al menú **Ayuda** para aprender a usar la plataforma.', icon='🎓')
     st.session_state["tutorial_seen"] = True
 
 if st.session_state.get("show_tutorial", False):
