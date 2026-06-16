@@ -718,7 +718,7 @@ with tab_raices:
         with st.container():
             
             st.markdown(f"**{t['F_MAIN']}**")
-            f_str = st.text_input("f(x)", value="2x^2 - x - 1", label_visibility="collapsed")
+            f_str = st.text_input("f(x)", value="2x^2 - x - 1", label_visibility="collapsed", key="f_str_tab1")
             f_valida = False
             try:
                 f_expr_preview = parse_expr(f_str, transformations=transformations)
@@ -738,7 +738,7 @@ with tab_raices:
             st.markdown("<br>", unsafe_allow_html=True)
 
             st.markdown(f"**{t['F_DESP']}**")
-            g_str = st.text_input("g(x)", value="(x + 1)/2x", label_visibility="collapsed")
+            g_str = st.text_input("g(x)", value="(x + 1)/2x", label_visibility="collapsed", key="g_str_tab1")
             g_valida = False
             try:
                 g_expr_preview = parse_expr(g_str, transformations=transformations)
@@ -760,16 +760,16 @@ with tab_raices:
             c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f"**{t['LIM_INF']}**")
-                xl = st.number_input("xₗ", value=1.0, format="%.5f", label_visibility="collapsed")
+                xl = st.number_input("xₗ", value=1.0, format="%.5f", label_visibility="collapsed", key="xl_tab1")
             with c2:
                 st.markdown(f"**{t['LIM_SUP']}**")
-                xu = st.number_input("xᵤ", value=2.0, format="%.5f", label_visibility="collapsed")
+                xu = st.number_input("xᵤ", value=2.0, format="%.5f", label_visibility="collapsed", key="xu_tab1")
             
             st.markdown(f"**{t['PTO_INI']}**")
-            x0 = st.number_input("x₀", value=1.0, format="%.5f", label_visibility="collapsed")
+            x0 = st.number_input("x₀", value=1.0, format="%.5f", label_visibility="collapsed", key="x0_tab1")
             
             st.markdown(f"**{t['TOL']}**")
-            tol = st.number_input("ε", value=0.001, format="%.5f", label_visibility="collapsed")
+            tol = st.number_input("ε", value=0.001, format="%.5f", label_visibility="collapsed", key="tol_tab1")
             
             st.markdown("<br>", unsafe_allow_html=True)
             ejecutar = st.button(t["CALC_BTN"], use_container_width=True)
@@ -911,17 +911,17 @@ with tab_regresion:
         with col_data:
             st.markdown(f"**{t.get('P0_LABEL', 'Punto Inicial P₀')}**")
             cx1, cy1 = st.columns(2)
-            x0_int = cx1.number_input("x₀", value=1.0, format="%.5f")
-            y0_int = cy1.number_input("f(x₀)", value=2.0, format="%.5f")
+            x0_int = cx1.number_input("x₀", value=1.0, format="%.5f", key="x0_int")
+            y0_int = cy1.number_input("f(x₀)", value=2.0, format="%.5f", key="y0_int")
             
             st.markdown(f"**{t.get('P1_LABEL', 'Punto Final P₁')}**")
             cx2, cy2 = st.columns(2)
-            x1_int = cx2.number_input("x₁", value=4.0, format="%.5f")
-            y1_int = cy2.number_input("f(x₁)", value=5.0, format="%.5f")
+            x1_int = cx2.number_input("x₁", value=4.0, format="%.5f", key="x1_int")
+            y1_int = cy2.number_input("f(x₁)", value=5.0, format="%.5f", key="y1_int")
             
             st.markdown("---")
             st.markdown(f"**{t.get('INT_X_VAL', 'Valor a interpolar x:')}**")
-            x_target = st.number_input("x", value=2.5, format="%.5f", label_visibility="collapsed")
+            x_target = st.number_input("x", value=2.5, format="%.5f", label_visibility="collapsed", key="xtarget_int")
             
             st.markdown("<br>", unsafe_allow_html=True)
             ejecutar_int = st.button(t.get('CALC_INT_BTN', 'CALCULAR INTERPOLACIÓN'), use_container_width=True)
@@ -964,7 +964,7 @@ with tab_regresion:
             
             st.markdown("---")
             st.markdown(f"**{t.get('LAG_X_VAL', 'Valor a interpolar x:')}**")
-            x_target_lag = st.number_input("x_lag", value=3.0, format="%.5f", label_visibility="collapsed")
+            x_target_lag = st.number_input("x_lag", value=3.0, format="%.5f", label_visibility="collapsed", key="xtarget_lag")
             
             st.markdown("<br>", unsafe_allow_html=True)
             ejecutar_lag = st.button(t.get('CALC_LAG_BTN', 'CALCULAR POLINOMIO'), use_container_width=True)
@@ -1047,13 +1047,13 @@ with tab_derivacion:
     
     with col_in_df:
         st.markdown(f"**{t.get('F_MAIN', 'Función f(x):')}**")
-        f_str_df = st.text_input("f(x)_df", value="sin(x) + x**2", label_visibility="collapsed")
+        f_str_df = st.text_input("f(x)_df", value="sin(x) + x**2", label_visibility="collapsed", key="f_tab3")
         
         st.markdown(f"**{t.get('DF_X', 'Punto a evaluar xᵢ:')}**")
-        xi = st.number_input("xᵢ", value=1.0, format="%.5f", label_visibility="collapsed")
+        xi = st.number_input("xᵢ", value=1.0, format="%.5f", label_visibility="collapsed", key="xi_tab3")
         
         st.markdown(f"**{t.get('DF_H', 'Tamaño de paso h:')}**")
-        h = st.number_input("h_paso", value=0.1, format="%.5f", label_visibility="collapsed")
+        h = st.number_input("h_paso", value=0.1, format="%.5f", label_visibility="collapsed", key="h_tab3")
         
         st.markdown("<br>", unsafe_allow_html=True)
         ejecutar_df = st.button(t.get('CALC_DF_BTN', 'CALCULAR DERIVADAS'), use_container_width=True)
@@ -1161,15 +1161,15 @@ with tab_integracion:
     
     with col_in_intg:
         st.markdown(f"**{t.get('F_MAIN', 'Función f(x):')}**")
-        f_str_intg = st.text_input("f(x)_intg", value="x**2 * exp(-x)", label_visibility="collapsed")
+        f_str_intg = st.text_input("f(x)_intg", value="x**2 * exp(-x)", label_visibility="collapsed", key="f_tab4")
         
         c_lim1, c_lim2 = st.columns(2)
         with c_lim1:
             st.markdown(f"**{t.get('INTG_A', 'Límite a:')}**")
-            a_intg = st.number_input("a_intg", value=0.0, format="%.5f", label_visibility="collapsed")
+            a_intg = st.number_input("a_intg", value=0.0, format="%.5f", label_visibility="collapsed", key="a_tab4")
         with c_lim2:
             st.markdown(f"**{t.get('INTG_B', 'Límite b:')}**")
-            b_intg = st.number_input("b_intg", value=3.0, format="%.5f", label_visibility="collapsed")
+            b_intg = st.number_input("b_intg", value=3.0, format="%.5f", label_visibility="collapsed", key="b_tab4")
             
         n_intg = 1
         # Pedir n solo si no es Trapecio Simple
@@ -1177,7 +1177,7 @@ with tab_integracion:
             st.markdown(f"**{t.get('INTG_N', 'Número de intervalos n:')}**")
             # Si es Simpson, n debe ser al menos 2
             min_n = 2 if metodo_intg == t.get("SIMPSON_METHOD", "Simpson (1/3 y 3/8)") else 1
-            n_intg = st.number_input("n_intg", min_value=min_n, max_value=1000, value=max(5, min_n), step=1, label_visibility="collapsed")
+            n_intg = st.number_input("n_intg", min_value=min_n, max_value=1000, value=max(5, min_n), step=1, label_visibility="collapsed", key="n_tab4")
             
         st.markdown("<br>", unsafe_allow_html=True)
         ejecutar_intg = st.button(t.get('CALC_INTG_BTN', 'CALCULAR ÁREA'), use_container_width=True)
@@ -1299,23 +1299,23 @@ with tab_edo:
     
     with col_in_edo:
         st.markdown("**" + t.get("ODE_F", "Ecuación y' = f(x, y):") + "**")
-        f_str_edo = st.text_input("f(x,y)_edo", value="x + y", label_visibility="collapsed")
+        f_str_edo = st.text_input("f(x,y)_edo", value="x + y", label_visibility="collapsed", key="f_tab5")
         
         c_val1, c_val2 = st.columns(2)
         with c_val1:
             st.markdown(f"**{t.get('ODE_X0', 'Valor inicial x₀:')}**")
-            x0_edo = st.number_input("x0_edo", value=0.0, format="%.5f", label_visibility="collapsed")
+            x0_edo = st.number_input("x0_edo", value=0.0, format="%.5f", label_visibility="collapsed", key="x0_tab5")
         with c_val2:
             st.markdown(f"**{t.get('ODE_Y0', 'Condición inicial y₀:')}**")
-            y0_edo = st.number_input("y0_edo", value=1.0, format="%.5f", label_visibility="collapsed")
+            y0_edo = st.number_input("y0_edo", value=1.0, format="%.5f", label_visibility="collapsed", key="y0_tab5")
             
         c_val3, c_val4 = st.columns(2)
         with c_val3:
             st.markdown(f"**{t.get('ODE_XF', 'Valor final x_f:')}**")
-            xf_edo = st.number_input("xf_edo", value=2.0, format="%.5f", label_visibility="collapsed")
+            xf_edo = st.number_input("xf_edo", value=2.0, format="%.5f", label_visibility="collapsed", key="xf_tab5")
         with c_val4:
             st.markdown(f"**{t.get('ODE_H', 'Tamaño de paso h:')}**")
-            h_edo = st.number_input("h_edo", value=0.5, format="%.5f", label_visibility="collapsed")
+            h_edo = st.number_input("h_edo", value=0.5, format="%.5f", label_visibility="collapsed", key="h_tab5")
             
         st.markdown("<br>", unsafe_allow_html=True)
         ejecutar_edo = st.button(t.get('CALC_ODE_BTN', 'RESOLVER EDO'), use_container_width=True)
