@@ -1298,7 +1298,7 @@ with tab_edo:
     col_in_edo, col_out_edo = st.columns([1, 2], gap="large")
     
     with col_in_edo:
-        st.markdown(f"**{t.get('ODE_F', \"Ecuación $y' = f(x, y)$:\")}**")
+        st.markdown("**" + t.get("ODE_F", "Ecuación $y' = f(x, y)$:") + "**")
         f_str_edo = st.text_input("f(x,y)_edo", value="x + y", label_visibility="collapsed")
         
         c_val1, c_val2 = st.columns(2)
