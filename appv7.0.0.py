@@ -95,7 +95,7 @@ LANG = {
         "COL_XU": "$x_u$",
         "COL_XR": "$x_r$",
         "COL_XI": "$x_i$",
-        "COL_XSIG": "$x_{i+1}$",
+        "COL_XSIG": "x_{i+1}",
         "COL_ERR": "Error Absoluto",
         "CURVE_F": "Curva f(x) y Puntos Encontrados",
         "AXIS_X": "EJE X",
@@ -222,7 +222,7 @@ LANG = {
         "COL_XU": "$x_u$",
         "COL_XR": "$x_r$",
         "COL_XI": "$x_i$",
-        "COL_XSIG": "$x_{i+1}$",
+        "COL_XSIG": "x_{i+1}",
         "COL_ERR": "Absolute Error",
         "CURVE_F": "Curve f(x) and Found Points",
         "AXIS_X": "X AXIS",
@@ -433,35 +433,7 @@ st.markdown("""
 </style>
 
 <div class="steam-top-bar">
-    <div class="steam-menu">
-        <div class="steam-menu-item hamburguesa">&#9776;
-            <div class="steam-dropdown">
-                <a href="?lang=es" target="_self">Español</a>
-                <a href="?lang=en" target="_self">English</a>
-            </div>
-        </div>
-    </div>
     <div class="steam-logo">Universidad Veracruzana</div>
-    <div class="steam-menu">
-        <div class="steam-menu-item">Archivo
-            <div class="steam-dropdown">
-                <a href="?action=reload" target="_self">Recargar plataforma</a>
-                <a href="?action=reset" target="_self">Borrar memoria caché</a>
-            </div>
-        </div>
-        <div class="steam-menu-item">Ver
-            <div class="steam-dropdown">
-                <a href="?theme=light" target="_self">Activar Tema Claro</a>
-                <a href="?theme=dark" target="_self">Activar Tema Oscuro</a>
-            </div>
-        </div>
-        <div class="steam-menu-item">Ayuda
-            <div class="steam-dropdown">
-                <a href="https://github.com/Azavkm/Metodos-UV" target="_blank">Repositorio de GitHub</a>
-                <a href="?action=tutorial" target="_self">Ver Guía de Inicio Rápido</a>
-            </div>
-        </div>
-    </div>
     <div class="steam-right">
         <div class="steam-menu-item steam-profile">Azael
             <div class="steam-dropdown" style="left: auto; right: 0;">
@@ -1326,7 +1298,7 @@ with tab_edo:
     col_in_edo, col_out_edo = st.columns([1, 2], gap="large")
     
     with col_in_edo:
-        st.markdown(f"**{t.get('ODE_F', "Ecuación $y' = f(x, y)$:")}**")
+        st.markdown(f"**{t.get('ODE_F', \"Ecuación $y' = f(x, y)$:\")}**")
         f_str_edo = st.text_input("f(x,y)_edo", value="x + y", label_visibility="collapsed")
         
         c_val1, c_val2 = st.columns(2)
