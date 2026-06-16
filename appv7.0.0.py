@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 import sympy as sp
 import pandas as pd
@@ -5,6 +6,38 @@ import numpy as np
 import plotly.graph_objects as go
 import time
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application, convert_xor
+
+import base64 # Agrega esto junto a tus otras importaciones (import streamlit as st, etc.)
+
+# ==========================================
+# CONFIGURACIÓN DE PÁGINA (Debe ser la primera instrucción)
+# ==========================================
+st.set_page_config(page_title="MÉTODOS NUMÉRICOS", layout="wide")
+
+# ==========================================
+# INYECCIÓN DE IMAGEN DE FONDO
+# ==========================================
+def agregar_fondo_local(ruta_imagen):
+    with open(ruta_imagen, "rb") as archivo_imagen:
+        imagen_codificada = base64.b64encode(archivo_imagen.read()).decode()
+    
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{imagen_codificada}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Llama a la función con el nombre exacto de tu archivo de imagen
+# (Asegúrate de que la imagen esté en la misma carpeta que este script)
+agregar_fondo_local("mikurescaled.png")
 
 # ==========================================
 # CONFIGURACIÓN DE PÁGINA (Debe ser la primera instrucción)
