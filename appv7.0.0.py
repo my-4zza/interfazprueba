@@ -1127,6 +1127,16 @@ with tab_derivacion:
                     c2.metric("Hacia Atrás", f"{df_atras:.5f}", f"Error: {err_atras:.5f}", delta_color="off")
                     c3.metric("Centrada", f"{df_centrada:.5f}", f"Error: {err_centrada:.5f}", delta_color="off")
                     
+                    st.markdown("#### Puntos Evaluados")
+                    tabla_df = pd.DataFrame({
+                        "Punto": ["x_i - h (Atrás)", "x_i (Centro)", "x_i + h (Adelante)"],
+                        "Valor x": [f"{xi - h:.5f}", f"{xi:.5f}", f"{xi + h:.5f}"],
+                        "f(x)": [f"{f_xi_menos_h:.5f}", f"{f_xi:.5f}", f"{f_xi_mas_h:.5f}"]
+                    })
+                    st.dataframe(tabla_df, use_container_width=True, hide_index=True)
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    # =================================
+                    
                     # Graficar la función y las tangentes
                     fig_df = go.Figure()
                     
@@ -1267,6 +1277,17 @@ with tab_integracion:
                     c2.metric(t.get('EXACT_AREA', 'Ref. Alta Resolución'), f"{area_exacta:.6f}")
                     c3.metric(t.get('COL_ERR', 'Error Absoluto'), f"{error_intg:.6f}", delta_color="off")
                     
+                    st.markdown("#### Coordenadas de los Intervalos")
+                    tabla_intg = pd.DataFrame({
+                        "Intervalo (i)": range(len(x_eval)),
+                        "Valor x_i": [f"{val:.5f}" for val in x_eval],
+                        "f(x_i)": [f"{val:.5f}" for val in y_eval]
+                    })
+                    # st.dataframe mostrará una tabla con scroll si hay muchos intervalos
+                    st.dataframe(tabla_intg, use_container_width=True, hide_index=True, height=200)
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    # ==================================
+
                     # 3. Gráfica de la Integración
                     fig_intg = go.Figure()
                     
