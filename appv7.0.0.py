@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 import sympy as sp
 import pandas as pd
@@ -9,12 +10,35 @@ from sympy.parsing.sympy_parser import parse_expr, standard_transformations, imp
 # ==========================================
 # CONFIGURACIÓN DE PÁGINA (Debe ser la primera instrucción)
 # ==========================================
-st.set_page_config(page_title="MÉTODOS NUMÉRICOS", layout="wide")
+st.set_page_config(page_title="Itera Studio", layout="wide")
+
+# ==========================================
+# INYECCIÓN DE IMAGEN DE FONDO
+# ==========================================
+def agregar_fondo_local(ruta_imagen):
+    with open(ruta_imagen, "rb") as archivo_imagen:
+        imagen_codificada = base64.b64encode(archivo_imagen.read()).decode()
+    
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{imagen_codificada}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Llama a la función con el nombre exacto de tu archivo de imagen
+agregar_fondo_local("mikurescaled.jpeg")
 
 # ==========================================
 # GESTIÓN DE ACCIONES Y PARÁMETROS DE URL
 # ==========================================
-# Esto reemplaza al JavaScript. Escucha los clics de la barra superior.
 params = st.query_params
 
 if "action" in params:
@@ -46,26 +70,26 @@ else:
     idioma_seleccionado = "ESPAÑOL"
 
 # ==========================================
-# DICCIONARIO DE IDIOMAS (LaTeX Corregido)
+# DICCIONARIO DE IDIOMAS 
 # ==========================================
 LANG = {
     "ESPAÑOL": {
-        "TITLE": "PLATAFORMA DE ANÁLISIS NUMÉRICO",
+        "TITLE": "ITERA STUDIO",
         "TAB1": "SOLUCIÓN DE ECUACIONES",
         "TAB2": "REGRESIÓN E INTERPOLACIÓN",
         "TAB_INFO": "INFORMACIÓN",
         "TAB_HELP": "AYUDA",
         "TAB_EXAMPLES": "EJEMPLOS",
         "PARAMS": "PARÁMETROS",
-        "F_MAIN": "Función principal $f(x)$:",
-        "F_DESP": "Función despejada $g(x)$ *(Para Punto Fijo)*:",
+        "F_MAIN": "Función principal f(x):",
+        "F_DESP": "Función despejada g(x) *(Para Punto Fijo)*:",
         "WAIT_FUNC": "Esperando una función válida...",
         "SHOW_F": "MOSTRAR GRÁFICA f(x)",
         "SHOW_G": "MOSTRAR GRÁFICA g(x)",
-        "LIM_INF": "Límite inferior $x_l$ *(o $x_{ant}$)*",
-        "LIM_SUP": "Límite superior $x_u$ *(o $x_{act}$)*",
-        "PTO_INI": "Punto inicial $x_0$",
-        "TOL": "Tolerancia $\\epsilon$",
+        "LIM_INF": "Límite inferior xₗ *(o x_ant)*",
+        "LIM_SUP": "Límite superior xᵤ *(o x_act)*",
+        "PTO_INI": "Punto inicial x₀",
+        "TOL": "Tolerancia ε",
         "CALC_BTN": "CALCULAR RAÍCES",
         "RES_TITLE": "RESULTADOS E ITERACIONES",
         "COMP_GRAPH": "VER GRÁFICA COMPARATIVA DE RAÍCES",
@@ -77,12 +101,12 @@ LANG = {
         "INFO_START_INTG": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'CALCULAR ÁREA'.",
         "INFO_START_ODE": "INGRESA LOS PARÁMETROS A LA IZQUIERDA Y PRESIONA 'RESOLVER EDO'.",
         "CONSTRUCTION": "MÓDULO EN CONSTRUCCIÓN.",
-        "ERR_OPPOSITE": "ERROR: $f(x_l)$ y $f(x_u)$ no tienen signos opuestos.",
+        "ERR_OPPOSITE": "ERROR: f(xₗ) y f(xᵤ) no tienen signos opuestos.",
         "ERR_EVAL": "ERROR: Fallo al evaluar los límites en la función.",
         "ERR_DIV0": "ERROR: División por cero durante el cálculo.",
         "ERR_DIV0_FAIL": "ERROR: División por cero. El método falla.",
         "ERR_CONVERGE": "ERROR: El método no converge después de 100 iteraciones.",
-        "ERR_DIVERGE": "ERROR: El método diverge con este despeje o punto inicial $x_0$.",
+        "ERR_DIVERGE": "ERROR: El método diverge con este despeje o punto inicial x₀.",
         "ROOT_APPROX": "Raíz Aproximada",
         "ITERS": "Iteraciones",
         "METH_BIS": "BISECCIÓN",
@@ -91,18 +115,18 @@ LANG = {
         "METH_SEC": "SECANTE",
         "METH_PF": "PUNTO FIJO",
         "COL_ITER": "Iteración",
-        "COL_XL": "$x_l$",
-        "COL_XU": "$x_u$",
-        "COL_XR": "$x_r$",
-        "COL_XI": "$x_i$",
-        "COL_XSIG": "$x_{i+1}$",
+        "COL_XL": "xₗ",
+        "COL_XU": "xᵤ",
+        "COL_XR": "xᵣ",
+        "COL_XI": "xᵢ",
+        "COL_XSIG": "xᵢ₊₁",
         "COL_ERR": "Error Absoluto",
         "CURVE_F": "Curva f(x) y Puntos Encontrados",
         "AXIS_X": "EJE X",
         "AXIS_Y": "EJE Y",
-        "INFO_TEXT": "Esta plataforma permite encontrar las raíces de ecuaciones algebraicas y trascendentes mediante cinco métodos numéricos clásicos ejecutados de forma simultánea. El objetivo es comparar la velocidad de convergencia y la precisión de cada algoritmo.",
-        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para $e^x$, `log(x)` para el logaritmo natural.",
-        "HELP_PARAMS": "### PARÁMETROS\n* **$x_l$ y $x_u$:** Requeridos para Bisección y Falsa Posición (deben encerrar la raíz).\n* **$x_0$:** Requerido para Newton-Raphson y Punto Fijo como valor inicial de búsqueda.\n* **$\\epsilon$:** El criterio de detención. El cálculo se detendrá cuando el error absoluto sea menor a este valor.",
+        "INFO_TEXT": "Somos estudiantes de la Universidad Veracruzana y desarrolladmos esta herramienta interactiva que te permite explorar los métodos numéricos clásicos aplicados a la ingeniería y ciencias exactas. No solo calcula raíces de ecuaciones, sino que también abarca regresión, interpolación, derivación, integración y ecuaciones diferenciales ordinarias (E.D.O.). El objetivo es que puedas comparar la precisión, velocidad y comportamiento de cada algoritmo mediante visualizaciones claras y tablas iterativas.",
+        "HELP_SYNTAX": "### SINTAXIS DE FUNCIONES\nLa calculadora interpreta texto natural matemático. Puedes usar:\n* **Potencias:** `x^2` o `x**2`\n* **Multiplicación implícita:** `2x` se interpreta automáticamente como `2*x`\n* **Fracciones:** `(x+1)/2`\n* **Funciones trigonométricas:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponenciales y logaritmos:** `exp(x)` para e^x, `log(x)` para el logaritmo natural.\n* **Múltiples variables:** Para las E.D.O., puedes usar `x` e y juntas (ej. `x + 2y` o `x*y`).",
+        "HELP_PARAMS": "### PARÁMETROS PRINCIPALES\n**Módulo de Raíces:**\n* **xₗ y xᵤ:** Límites que encierran la raíz (Bisección y Falsa Posición).\n* **x₀:** Valor inicial de búsqueda (Newton-Raphson y Punto Fijo).\n* **ε:** Tolerancia. El cálculo se detiene cuando el error es menor a este valor.\n\n**Otros Módulos:**\n* **P₀ y P₁ / Puntos (x,y):** Coordenadas base para trazar los ajustes de regresión o interpolación.\n* **h:** Tamaño de paso utilizado para el cálculo de Derivadas y E.D.O.\n* **a y b:** Límites inferior y superior para delimitar el área de Integración.\n* **n:** Número de intervalos o particiones para los métodos de Integración.",
         "EX_1_TITLE": "Ejemplo 1: Polinomio Algebraico",
         "EX_2_TITLE": "Ejemplo 2: Ecuación Trascendente",
         "EX_3_TITLE": "Ejemplo 3: Convergencia de Punto Fijo",
@@ -119,26 +143,26 @@ LANG = {
         "METHOD_LS": "Mínimos Cuadrados",
         "METHOD_NEWTON_LIN": "Interpolación Lineal (Newton)",
         "INT_TITLE": "INTERPOLACIÓN LINEAL DE NEWTON",
-        "P0_LABEL": "Punto Inicial $P_0$",
-        "P1_LABEL": "Punto Final $P_1$",
-        "INT_X_VAL": "Valor a interpolar $x$:",
+        "P0_LABEL": "Punto Inicial P₀",
+        "P1_LABEL": "Punto Final P₁",
+        "INT_X_VAL": "Valor a interpolar x:",
         "CALC_INT_BTN": "CALCULAR INTERPOLACIÓN",
         "INT_RES": "Resultado de la Interpolación",
         "INT_EQ": "Sustitución en la fórmula:",
-        "ERR_X_EQUAL": "ERROR: $x_0$ y $x_1$ no pueden ser iguales (división por cero).",
+        "ERR_X_EQUAL": "ERROR: x₀ y x₁ no pueden ser iguales (división por cero).",
         "METHOD_LAGRANGE": "Interpolación (Lagrange)",
         "LAG_TITLE": "INTERPOLACIÓN POLINOMIAL DE LAGRANGE",
         "LAG_DATA": "Puntos Conocidos (x, y)",
         "LAG_ADD_DEL": "Agrega tantos puntos como necesites. No repitas valores de X.",
-        "LAG_X_VAL": "Valor a interpolar $x$:",
+        "LAG_X_VAL": "Valor a interpolar x:",
         "CALC_LAG_BTN": "CALCULAR POLINOMIO",
         "LAG_RES": "Resultado de Lagrange",
         "LAG_POLY": "Polinomio Evaluado:",
         "ERR_DUP_X": "ERROR: Hay valores de X repetidos. Esto causa división por cero en Lagrange.",
         "TAB3": "DERIVACIÓN NUMÉRICA",
         "DF_TITLE": "DIFERENCIAS FINITAS (1ra Derivada)",
-        "DF_X": "Punto a evaluar $x_i$:",
-        "DF_H": "Tamaño de paso $h$:",
+        "DF_X": "Punto a evaluar xᵢ:",
+        "DF_H": "Tamaño de paso h:",
         "CALC_DF_BTN": "CALCULAR DERIVADAS",
         "DF_RES": "Resultados de Aproximación",
         "ERR_H_ZERO": "ERROR: El tamaño de paso h no puede ser cero.",
@@ -147,9 +171,9 @@ LANG = {
         "INTG_METHOD": "Selecciona la variante:",
         "TRAP_SIMPLE": "Trapecio Simple",
         "TRAP_MULTIPLE": "Trapecio Múltiple",
-        "INTG_A": "Límite inferior $a$:",
-        "INTG_B": "Límite superior $b$:",
-        "INTG_N": "Número de intervalos $n$:",
+        "INTG_A": "Límite inferior a:",
+        "INTG_B": "Límite superior b:",
+        "INTG_N": "Número de intervalos n:",
         "CALC_INTG_BTN": "CALCULAR ÁREA",
         "INTG_RES": "Resultados de Integración",
         "EXACT_AREA": "Área Alta Resolución (Ref.)",
@@ -158,41 +182,41 @@ LANG = {
         "SIMPSON_METHOD": "Simpson (1/3 y 3/8)",
         "SIMP_TITLE": "MÉTODO DE SIMPSON",
         "ERR_N_SIMPSON": "ERROR: El método de Simpson requiere al menos n=2 intervalos.",
-        "INFO_SIMPSON_EVEN": "Se aplicó **Simpson 1/3** en todo el rango porque $n$ es par.",
-        "INFO_SIMPSON_ODD": "Se aplicó **Simpson 1/3** al principio y **Simpson 3/8** en los últimos 3 intervalos porque $n$ es impar.",
+        "INFO_SIMPSON_EVEN": "Se aplicó **Simpson 1/3** en todo el rango porque n es par.",
+        "INFO_SIMPSON_ODD": "Se aplicó **Simpson 1/3** al principio y **Simpson 3/8** en los últimos 3 intervalos porque n es impar.",
         "TAB5": "ECUACIONES DIFERENCIALES",
         "ODE_TITLE": "RESOLUCIÓN DE E.D.O.",
         "ODE_METHOD": "Selecciona el método:",
         "METH_EULER": "Método de Euler",
         "METH_HEUN": "Método de Heun",
         "METH_RALSTON": "Método de Ralston",
-        "ODE_F": "Ecuación $y' = f(x, y)$:",
-        "ODE_X0": "Valor inicial $x_0$:",
-        "ODE_Y0": "Condición inicial $y_0$:",
-        "ODE_XF": "Valor final $x_f$:",
-        "ODE_H": "Tamaño de paso $h$:",
+        "ODE_F": "Ecuación y' = f(x, y):",
+        "ODE_X0": "Valor inicial x₀:",
+        "ODE_Y0": "Condición inicial y₀:",
+        "ODE_XF": "Valor final x_f:",
+        "ODE_H": "Tamaño de paso h:",
         "CALC_ODE_BTN": "RESOLVER EDO",
         "ODE_RES": "Tabla de Iteraciones",
         "ODE_GRAPH": "Trayectoria de la Solución",
         "ERR_ODE_H": "ERROR: El tamaño de paso h debe ser mayor a 0 y caber en el intervalo.",
     },
     "ENGLISH": {
-        "TITLE": "NUMERICAL ANALYSIS PLATFORM",
+        "TITLE": "ITERA STUDIO",
         "TAB1": "EQUATION SOLVING",
         "TAB2": "REGRESSION & INTERPOLATION",
         "TAB_INFO": "INFO",
         "TAB_HELP": "HELP",
         "TAB_EXAMPLES": "EXAMPLES",
         "PARAMS": "PARAMETERS",
-        "F_MAIN": "Main function $f(x)$:",
-        "F_DESP": "Isolated function $g(x)$ *(For Fixed Point)*:",
+        "F_MAIN": "Main function f(x):",
+        "F_DESP": "Isolated function g(x) *(For Fixed Point)*:",
         "WAIT_FUNC": "Waiting for a valid function...",
         "SHOW_F": "SHOW f(x) GRAPH",
         "SHOW_G": "SHOW g(x) GRAPH",
-        "LIM_INF": "Lower limit $x_l$ *(or $x_{prev}$)*",
-        "LIM_SUP": "Upper limit $x_u$ *(or $x_{curr}$)*",
-        "PTO_INI": "Initial point $x_0$",
-        "TOL": "Tolerance $\\epsilon$",
+        "LIM_INF": "Lower limit xₗ *(or x_prev)*",
+        "LIM_SUP": "Upper limit xᵤ *(or x_curr)*",
+        "PTO_INI": "Initial point x₀",
+        "TOL": "Tolerance ε",
         "CALC_BTN": "CALCULATE ROOTS",
         "RES_TITLE": "RESULTS & ITERATIONS",
         "COMP_GRAPH": "VIEW COMPARATIVE ROOTS GRAPH",
@@ -204,12 +228,12 @@ LANG = {
         "INFO_START_INTG": "ENTER PARAMETERS ON THE LEFT AND PRESS 'CALCULATE AREA'.",
         "INFO_START_ODE": "ENTER PARAMETERS ON THE LEFT AND PRESS 'SOLVE ODE'.",
         "CONSTRUCTION": "MODULE UNDER CONSTRUCTION.",
-        "ERR_OPPOSITE": "ERROR: $f(x_l)$ and $f(x_u)$ do not have opposite signs.",
+        "ERR_OPPOSITE": "ERROR: f(xₗ) and f(xᵤ) do not have opposite signs.",
         "ERR_EVAL": "ERROR: Failed to evaluate limits in the function.",
         "ERR_DIV0": "ERROR: Division by zero during calculation.",
         "ERR_DIV0_FAIL": "ERROR: Division by zero. Method fails.",
         "ERR_CONVERGE": "ERROR: Method does not converge after 100 iterations.",
-        "ERR_DIVERGE": "ERROR: Method diverges with this function or initial point $x_0$.",
+        "ERR_DIVERGE": "ERROR: Method diverges with this function or initial point x₀.",
         "ROOT_APPROX": "Approximate Root",
         "ITERS": "Iterations",
         "METH_BIS": "BISECTION",
@@ -218,18 +242,18 @@ LANG = {
         "METH_SEC": "SECANT",
         "METH_PF": "FIXED POINT",
         "COL_ITER": "Iteration",
-        "COL_XL": "$x_l$",
-        "COL_XU": "$x_u$",
-        "COL_XR": "$x_r$",
-        "COL_XI": "$x_i$",
-        "COL_XSIG": "$x_{i+1}$",
+        "COL_XL": "xₗ",
+        "COL_XU": "xᵤ",
+        "COL_XR": "xᵣ",
+        "COL_XI": "xᵢ",
+        "COL_XSIG": "xᵢ₊₁",
         "COL_ERR": "Absolute Error",
         "CURVE_F": "Curve f(x) and Found Points",
         "AXIS_X": "X AXIS",
         "AXIS_Y": "Y AXIS",
-        "INFO_TEXT": "This platform allows finding the roots of algebraic and transcendental equations using five classic numerical methods executed simultaneously. The objective is to compare the convergence speed and precision of each algorithm for the same mathematical function.",
-        "HELP_SYNTAX": "### FUNCTION SYNTAX\nThe calculator interprets natural mathematical text. You can use:\n* **Powers:** `x^2` or `x**2`\n* **Implicit multiplication:** `2x` is automatically parsed as `2*x`\n* **Fractions:** `(x+1)/2`\n* **Trigonometric functions:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponentials and logarithms:** `exp(x)` for $e^x$, `log(x)` for natural logarithm.",
-        "HELP_PARAMS": "### PARAMETERS\n* **$x_l$ and $x_u$:** Required for Bisection and False Position (must enclose the root).\n* **$x_0$:** Required for Newton-Raphson and Fixed Point as the initial search value.\n* **$\\epsilon$:** The stopping criterion. Calculation stops when the absolute error is less than this value.",
+        "INFO_TEXT": "We are students at the University of Veracruz and we developed this interactive tool that allows you to explore classical numerical methods applied to engineering and the exact sciences. It not only calculates roots of equations, but also covers regression, interpolation, differentiation, integration, and ordinary differential equations (ODEs). The goal is for you to be able to compare the accuracy, speed, and behavior of each algorithm through clear visualizations and iterative tables.",
+        "HELP_SYNTAX": "### FUNCTION SYNTAX\nThe calculator interprets natural mathematical text. You can use:\n* **Powers:** `x^2` or `x**2`\n* **Implicit multiplication:** `2x` is automatically parsed as `2*x`\n* **Fractions:** `(x+1)/2`\n* **Trigonometric functions:** `sin(x)`, `cos(x)`, `tan(x)`\n* **Exponentials and logarithms:** `exp(x)` for e^x, `log(x)` for natural logarithm.\n* **Multiple variables:** For ODEs, you can use `x` and `y` together (e.g. `x + 2y` or `x*y`).",
+        "HELP_PARAMS": "### MAIN PARAMETERS\n**Roots Module:**\n* **xₗ and xᵤ:** Limits that enclose the root (Bisection and False Position).\n* **x₀:** Initial search value (Newton-Raphson and Fixed Point).\n* **ε:** Tolerance. Calculation stops when the error is less than this value.\n\n**Other Modules:**\n* **P₀ and P₁ / Points (x,y):** Base coordinates to draw regression or interpolation fits.\n* **h:** Step size used for Derivatives and ODE calculations.\n* **a and b:** Lower and upper limits to bound the Integration area.\n* **n:** Number of intervals or partitions for Integration methods.",
         "EX_1_TITLE": "Example 1: Algebraic Polynomial",
         "EX_2_TITLE": "Example 2: Transcendental Equation",
         "EX_3_TITLE": "Example 3: Fixed Point Convergence",
@@ -246,26 +270,26 @@ LANG = {
         "METHOD_LS": "Least Squares",
         "METHOD_NEWTON_LIN": "Linear Interpolation (Newton)",
         "INT_TITLE": "NEWTON'S LINEAR INTERPOLATION",
-        "P0_LABEL": "Initial Point $P_0$",
-        "P1_LABEL": "Final Point $P_1$",
-        "INT_X_VAL": "Value to interpolate $x$:",
+        "P0_LABEL": "Initial Point P₀",
+        "P1_LABEL": "Final Point P₁",
+        "INT_X_VAL": "Value to interpolate x:",
         "CALC_INT_BTN": "CALCULATE INTERPOLATION",
         "INT_RES": "Interpolation Result",
         "INT_EQ": "Formula substitution:",
-        "ERR_X_EQUAL": "ERROR: $x_0$ and $x_1$ cannot be equal (division by zero).",
+        "ERR_X_EQUAL": "ERROR: x₀ and x₁ cannot be equal (division by zero).",
         "METHOD_LAGRANGE": "Interpolation (Lagrange)",
         "LAG_TITLE": "LAGRANGE POLYNOMIAL INTERPOLATION",
         "LAG_DATA": "Known Points (x, y)",
         "LAG_ADD_DEL": "Add as many points as needed. Do not repeat X values.",
-        "LAG_X_VAL": "Value to interpolate $x$:",
+        "LAG_X_VAL": "Value to interpolate x:",
         "CALC_LAG_BTN": "CALCULATE POLYNOMIAL",
         "LAG_RES": "Lagrange Result",
         "LAG_POLY": "Evaluated Polynomial:",
         "ERR_DUP_X": "ERROR: Duplicate X values found. This causes division by zero in Lagrange.",
         "TAB3": "NUMERICAL DIFFERENTIATION",
         "DF_TITLE": "FINITE DIFFERENCES (1st Derivative)",
-        "DF_X": "Evaluation point $x_i$:",
-        "DF_H": "Step size $h$:",
+        "DF_X": "Evaluation point xᵢ:",
+        "DF_H": "Step size h:",
         "CALC_DF_BTN": "CALCULATE DERIVATIVES",
         "DF_RES": "Approximation Results",
         "ERR_H_ZERO": "ERROR: Step size h cannot be zero.",
@@ -274,9 +298,9 @@ LANG = {
         "INTG_METHOD": "Select variant:",
         "TRAP_SIMPLE": "Single Trapezoid",
         "TRAP_MULTIPLE": "Multiple Trapezoids",
-        "INTG_A": "Lower limit $a$:",
-        "INTG_B": "Upper limit $b$:",
-        "INTG_N": "Number of intervals $n$:",
+        "INTG_A": "Lower limit a:",
+        "INTG_B": "Upper limit b:",
+        "INTG_N": "Number of intervals n:",
         "CALC_INTG_BTN": "CALCULATE AREA",
         "INTG_RES": "Integration Results",
         "EXACT_AREA": "High-Res Area (Reference)",
@@ -285,19 +309,19 @@ LANG = {
         "SIMPSON_METHOD": "Simpson (1/3 & 3/8)",
         "SIMP_TITLE": "SIMPSON'S RULE",
         "ERR_N_SIMPSON": "ERROR: Simpson's rule requires at least n=2 intervals.",
-        "INFO_SIMPSON_EVEN": "Applied **Simpson 1/3** over the entire range because $n$ is even.",
-        "INFO_SIMPSON_ODD": "Applied **Simpson 1/3** initially and **Simpson 3/8** on the last 3 intervals because $n$ is odd.",
+        "INFO_SIMPSON_EVEN": "Applied **Simpson 1/3** over the entire range because n is even.",
+        "INFO_SIMPSON_ODD": "Applied **Simpson 1/3** initially and **Simpson 3/8** on the last 3 intervals because n is odd.",
         "TAB5": "DIFFERENTIAL EQUATIONS",
         "ODE_TITLE": "O.D.E. SOLVER",
         "ODE_METHOD": "Select method:",
         "METH_EULER": "Euler's Method",
         "METH_HEUN": "Heun's Method",
         "METH_RALSTON": "Ralston's Method",
-        "ODE_F": "Equation $y' = f(x, y)$:",
-        "ODE_X0": "Initial value $x_0$:",
-        "ODE_Y0": "Initial condition $y_0$:",
-        "ODE_XF": "Final value $x_f$:",
-        "ODE_H": "Step size $h$:",
+        "ODE_F": "Equation y' = f(x, y):",
+        "ODE_X0": "Initial value x₀:",
+        "ODE_Y0": "Initial condition y₀:",
+        "ODE_XF": "Final value x_f:",
+        "ODE_H": "Step size h:",
         "CALC_ODE_BTN": "SOLVE ODE",
         "ODE_RES": "Iteration Table",
         "ODE_GRAPH": "Solution Trajectory",
@@ -365,7 +389,7 @@ st.markdown("""
         border: 1px solid rgba(128, 128, 128, 0.3); background-color: rgba(128, 128, 128, 0.05);
     }
     div[data-testid="stTextInput"] input:focus {
-        border-color: #1a73e8; box-shadow: 0 4px 10px rgba(26, 115, 232, 0.1);
+        border-color: #7c6dd9; box-shadow: 0 4px 10px rgba(124, 109, 217, 0.2);
     }
     div[data-testid="stNumberInputContainer"] { border-radius: 10px !important; overflow: hidden; }
     div[data-testid="stNumberInput"] button:first-of-type { color: #ff4d4d !important; transition: all 0.2s ease; }
@@ -377,11 +401,11 @@ st.markdown("""
     div[data-testid="stNumberInput"] button:last-of-type:hover { background-color: rgba(0, 204, 102, 0.15) !important; color: #00994d !important; }
     div[data-testid="stNumberInput"] button:last-of-type:hover svg { fill: #00994d !important; }
     div[data-testid="stButton"] button {
-        border-radius: 15px; background-color: #1a73e8; color: white;
+        border-radius: 15px; background-color: #7c6dd9; color: white;
         font-weight: bold; transition: all 0.3s ease; border: none; padding: 10px 20px;
     }
     div[data-testid="stButton"] button:hover {
-        background-color: #1557b0; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(26, 115, 232, 0.3);
+        background-color: #5a4eb3; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(124, 109, 217, 0.4);
     }
     div[data-testid="stMetric"] {
         background-color: rgba(128, 128, 128, 0.05); padding: 15px; border-radius: 12px;
@@ -390,9 +414,9 @@ st.markdown("""
     div[data-testid="stMetric"]:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
     .math-preview { padding: 10px 0px; margin-bottom: 5px; display: flex; justify-content: center; }
     div[data-testid="stExpander"] details summary {
-        background-color: #88C7F2 !important; color: #000000 !important; border-radius: 8px; font-weight: 600;
+        background-color: #7c6dd9 !important; color: #000000 !important; border-radius: 8px; font-weight: 600;
     }
-    div[data-testid="stExpander"] details summary:hover { background-color: #7ab3da !important; }
+    div[data-testid="stExpander"] details summary:hover { background-color: #5a4eb3 !important; }
     div[data-testid="stExpander"] details summary p { font-family: 'Samsung Sharp Sans', -apple-system, sans-serif !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -424,11 +448,6 @@ st.markdown("""
 }
 .steam-dropdown a:hover { background-color: #2a475e; color: #ffffff; }
 .steam-right { margin-left: auto; display: flex; align-items: center; }
-.steam-profile {
-    color: #66c0f4; font-weight: 500; cursor: pointer; display: flex;
-    align-items: center; gap: 5px; padding: 5px 10px; border-radius: 3px; transition: background 0.2s;
-}
-.steam-profile:hover { background-color: #2a475e; color: #ffffff; }
 .hamburguesa { font-size: 16px; font-weight: 800; margin-right: 15px; }
 </style>
 
@@ -441,34 +460,7 @@ st.markdown("""
             </div>
         </div>
     </div>
-    <div class="steam-logo">Universidad Veracruzana</div>
-    <div class="steam-menu">
-        <div class="steam-menu-item">Archivo
-            <div class="steam-dropdown">
-                <a href="?action=reload" target="_self">Recargar plataforma</a>
-                <a href="?action=reset" target="_self">Borrar memoria caché</a>
-            </div>
-        </div>
-        <div class="steam-menu-item">Ver
-            <div class="steam-dropdown">
-                <a href="?theme=light" target="_self">Activar Tema Claro</a>
-                <a href="?theme=dark" target="_self">Activar Tema Oscuro</a>
-            </div>
-        </div>
-        <div class="steam-menu-item">Ayuda
-            <div class="steam-dropdown">
-                <a href="https://github.com/Azavkm/Metodos-UV" target="_blank">Repositorio de GitHub</a>
-                <a href="?action=tutorial" target="_self">Ver Guía de Inicio Rápido</a>
-            </div>
-        </div>
-    </div>
-    <div class="steam-right">
-        <div class="steam-menu-item steam-profile">Azael
-            <div class="steam-dropdown" style="left: auto; right: 0;">
-                <a href="?action=expert" target="_self">Activar/Desactivar Modo Experto</a>
-            </div>
-        </div>
-    </div>
+    <div class="steam-logo">Itera Studio</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -476,14 +468,14 @@ st.markdown("""
 # NOTIFICACIÓN Y GUÍA DE INICIO (Nativo)
 # ==========================================
 if "tutorial_seen" not in st.session_state:
-    st.toast('👋 ¡Hola! Si eres nuevo, ve al menú **Ayuda > Ver Guía de Inicio Rápido** para aprender a usar la plataforma.', icon='🎓')
+    st.toast('¡Hola! Si eres nuevo, ve al menú **Ayuda** para aprender a usar la plataforma.', icon='🎓')
     st.session_state["tutorial_seen"] = True
 
 if st.session_state.get("show_tutorial", False):
     st.success("""
     ### 🎓 Guía de Inicio Rápido
     1. **Ingresa tu Función:** A la izquierda, escribe tu función usando lenguaje natural (Ej: `x^2 - 4` o `sin(x)`).
-    2. **Define Parámetros:** Ajusta los límites ($x_l$, $x_u$) y el punto inicial ($x_0$). Fija tu tolerancia.
+    2. **Define Parámetros:** Ajusta los límites (xₗ, xᵤ) y el punto inicial (x₀). Fija tu tolerancia.
     3. **Calcula:** Haz clic en 'CALCULAR RAÍCES'. El motor procesará los 5 algoritmos a la vez.
     4. **Analiza:** Observa la gráfica comparativa y abre cada pestaña para ver la tabla iterativa.
     
@@ -527,7 +519,7 @@ def crear_grafica(func_lambdificada, titulo, raices_encontradas=None):
             y_vals[i] = np.nan
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name=titulo, line=dict(color='#1a73e8', width=2)))
+    fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name=titulo, line=dict(color='#7c6dd9', width=2)))
     
     fig.update_layout(
         title=titulo,
@@ -746,7 +738,7 @@ with tab_raices:
         with st.container():
             
             st.markdown(f"**{t['F_MAIN']}**")
-            f_str = st.text_input("f(x)", value="2x^2 - x - 1", label_visibility="collapsed")
+            f_str = st.text_input("f(x)", value="2x^2 - x - 1", label_visibility="collapsed", key="f_str_tab1")
             f_valida = False
             try:
                 f_expr_preview = parse_expr(f_str, transformations=transformations)
@@ -766,7 +758,7 @@ with tab_raices:
             st.markdown("<br>", unsafe_allow_html=True)
 
             st.markdown(f"**{t['F_DESP']}**")
-            g_str = st.text_input("g(x)", value="(x + 1)/2x", label_visibility="collapsed")
+            g_str = st.text_input("g(x)", value="(x + 1)/2x", label_visibility="collapsed", key="g_str_tab1")
             g_valida = False
             try:
                 g_expr_preview = parse_expr(g_str, transformations=transformations)
@@ -788,16 +780,16 @@ with tab_raices:
             c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f"**{t['LIM_INF']}**")
-                xl = st.number_input("xl", value=1.0, format="%.5f", label_visibility="collapsed")
+                xl = st.number_input("xₗ", value=1.0, format="%.5f", label_visibility="collapsed", key="xl_tab1")
             with c2:
                 st.markdown(f"**{t['LIM_SUP']}**")
-                xu = st.number_input("xu", value=2.0, format="%.5f", label_visibility="collapsed")
+                xu = st.number_input("xᵤ", value=2.0, format="%.5f", label_visibility="collapsed", key="xu_tab1")
             
             st.markdown(f"**{t['PTO_INI']}**")
-            x0 = st.number_input("x0", value=1.0, format="%.5f", label_visibility="collapsed")
+            x0 = st.number_input("x₀", value=1.0, format="%.5f", label_visibility="collapsed", key="x0_tab1")
             
             st.markdown(f"**{t['TOL']}**")
-            tol = st.number_input("tol", value=0.001, format="%.5f", label_visibility="collapsed")
+            tol = st.number_input("ε", value=0.001, format="%.5f", label_visibility="collapsed", key="tol_tab1")
             
             st.markdown("<br>", unsafe_allow_html=True)
             ejecutar = st.button(t["CALC_BTN"], use_container_width=True)
@@ -913,7 +905,7 @@ with tab_regresion:
                         r2 = 1 - (st_dev_res / st_dev_tot) if st_dev_tot != 0 else 1
                         r = np.sqrt(abs(r2)) * (1 if a1 > 0 else -1)
                         
-                        st.info(f"**{t.get('MODEL_EQ', 'Ecuación:')}** $y = {a1:.5f}x {'+' if a0 >= 0 else ''} {a0:.5f}$")
+                        st.info(f"**{t.get('MODEL_EQ', 'Ecuación:')}** y = {a1:.5f}x {'+' if a0 >= 0 else ''} {a0:.5f}")
                         c1, c2 = st.columns(2)
                         c1.metric(t.get('COEF_CORR', 'r'), f"{r:.5f}")
                         c2.metric(t.get('COEF_DET', 'R²'), f"{r2:.5f}")
@@ -922,7 +914,7 @@ with tab_regresion:
                         fig_reg.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', name='Datos', marker=dict(size=10, color='#ff4d4d')))
                         
                         x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
-                        fig_reg.add_trace(go.Scatter(x=x_line, y=a0 + a1 * x_line, mode='lines', name='Ajuste', line=dict(color='#1a73e8', width=3)))
+                        fig_reg.add_trace(go.Scatter(x=x_line, y=a0 + a1 * x_line, mode='lines', name='Ajuste', line=dict(color='#7c6dd9', width=3)))
                         
                         fig_reg.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                         st.plotly_chart(fig_reg, use_container_width=True)
@@ -937,19 +929,19 @@ with tab_regresion:
         col_data, col_res_int = st.columns([1, 2], gap="large")
         
         with col_data:
-            st.markdown(f"**{t.get('P0_LABEL', 'Punto Inicial $P_0$')}**")
+            st.markdown(f"**{t.get('P0_LABEL', 'Punto Inicial P₀')}**")
             cx1, cy1 = st.columns(2)
-            x0_int = cx1.number_input("$x_0$", value=1.0, format="%.5f")
-            y0_int = cy1.number_input("$f(x_0)$", value=2.0, format="%.5f")
+            x0_int = cx1.number_input("x₀", value=1.0, format="%.5f", key="x0_int")
+            y0_int = cy1.number_input("f(x₀)", value=2.0, format="%.5f", key="y0_int")
             
-            st.markdown(f"**{t.get('P1_LABEL', 'Punto Final $P_1$')}**")
+            st.markdown(f"**{t.get('P1_LABEL', 'Punto Final P₁')}**")
             cx2, cy2 = st.columns(2)
-            x1_int = cx2.number_input("$x_1$", value=4.0, format="%.5f")
-            y1_int = cy2.number_input("$f(x_1)$", value=5.0, format="%.5f")
+            x1_int = cx2.number_input("x₁", value=4.0, format="%.5f", key="x1_int")
+            y1_int = cy2.number_input("f(x₁)", value=5.0, format="%.5f", key="y1_int")
             
             st.markdown("---")
-            st.markdown(f"**{t.get('INT_X_VAL', 'Valor a interpolar $x$:')}**")
-            x_target = st.number_input("x", value=2.5, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('INT_X_VAL', 'Valor a interpolar x:')}**")
+            x_target = st.number_input("x", value=2.5, format="%.5f", label_visibility="collapsed", key="xtarget_int")
             
             st.markdown("<br>", unsafe_allow_html=True)
             ejecutar_int = st.button(t.get('CALC_INT_BTN', 'CALCULAR INTERPOLACIÓN'), use_container_width=True)
@@ -958,16 +950,16 @@ with tab_regresion:
             st.markdown(f"### {t.get('INT_RES', 'Resultado')}")
             if ejecutar_int:
                 if x0_int == x1_int:
-                    st.error(t.get('ERR_X_EQUAL', 'ERROR: $x_0$ y $x_1$ no pueden ser iguales.'))
+                    st.error(t.get('ERR_X_EQUAL', 'ERROR: x₀ y x₁ no pueden ser iguales.'))
                 else:
                     diferencia_dividida = (y1_int - y0_int) / (x1_int - x0_int)
                     fx_target = y0_int + diferencia_dividida * (x_target - x0_int)
-                    st.metric(label=f"$f({x_target})$", value=f"{fx_target:.5f}")
+                    st.metric(label=f"f({x_target})", value=f"{fx_target:.5f}")
                     
-                    st.info(f"**{t.get('INT_EQ', 'Sustitución:')}** $f_1({x_target}) = {y0_int} + \\left(\\frac{{{y1_int} - {y0_int}}}{{{x1_int} - {x0_int}}}\\right) ({x_target} - {x0_int})$")
+                    st.info(f"**{t.get('INT_EQ', 'Sustitución:')}** f₁({x_target}) = {y0_int} + (({y1_int} - {y0_int}) / ({x1_int} - {x0_int})) * ({x_target} - {x0_int})")
                     
                     fig_int = go.Figure()
-                    fig_int.add_trace(go.Scatter(x=[x0_int, x1_int], y=[y0_int, y1_int], mode='markers+lines', name='Intervalo', marker=dict(size=10, color='#1a73e8')))
+                    fig_int.add_trace(go.Scatter(x=[x0_int, x1_int], y=[y0_int, y1_int], mode='markers+lines', name='Intervalo', marker=dict(size=10, color='#7c6dd9')))
                     fig_int.add_trace(go.Scatter(x=[x_target], y=[fx_target], mode='markers', name='Punto Interpolado', marker=dict(size=12, color='#ff4d4d', symbol='star')))
                     fig_int.update_layout(title=t.get('GRAPH_REG', 'Gráfica'), xaxis_title=t["AXIS_X"], yaxis_title=t["AXIS_Y"], hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20))
                     st.plotly_chart(fig_int, use_container_width=True)
@@ -991,8 +983,8 @@ with tab_regresion:
             edited_df_lag = st.data_editor(st.session_state.df_lag, num_rows="dynamic", use_container_width=True, hide_index=True)
             
             st.markdown("---")
-            st.markdown(f"**{t.get('LAG_X_VAL', 'Valor a interpolar $x$:')}**")
-            x_target_lag = st.number_input("x_lag", value=3.0, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('LAG_X_VAL', 'Valor a interpolar x:')}**")
+            x_target_lag = st.number_input("x_lag", value=3.0, format="%.5f", label_visibility="collapsed", key="xtarget_lag")
             
             st.markdown("<br>", unsafe_allow_html=True)
             ejecutar_lag = st.button(t.get('CALC_LAG_BTN', 'CALCULAR POLINOMIO'), use_container_width=True)
@@ -1024,7 +1016,7 @@ with tab_regresion:
 
                     # Cálculo del punto objetivo
                     fx_target_lag = lagrange_eval(x_target_lag)
-                    st.metric(label=f"$P_{n_lag-1}({x_target_lag})$", value=f"{fx_target_lag:.5f}")
+                    st.metric(label=f"P({x_target_lag})", value=f"{fx_target_lag:.5f}")
                     
                     # Graficación
                     fig_lag = go.Figure()
@@ -1034,7 +1026,7 @@ with tab_regresion:
                         x=x_vals, y=y_vals, 
                         mode='markers', 
                         name='Puntos Conocidos',
-                        marker=dict(size=10, color='#1a73e8', symbol='circle')
+                        marker=dict(size=10, color='#7c6dd9', symbol='circle')
                     ))
                     
                     # Punto interpolado
@@ -1052,8 +1044,8 @@ with tab_regresion:
                     fig_lag.add_trace(go.Scatter(
                         x=x_rango, y=y_rango, 
                         mode='lines', 
-                        name=f'Polinomio $P_{n_lag-1}(x)$',
-                        line=dict(color='rgba(26, 115, 232, 0.5)', width=2, dash='dot')
+                        name=f'Polinomio P(x)',
+                        line=dict(color='rgba(124, 109, 217, 0.5)', width=2, dash='dot')
                     ))
                     
                     fig_lag.update_layout(
@@ -1074,14 +1066,14 @@ with tab_derivacion:
     col_in_df, col_out_df = st.columns([1, 2], gap="large")
     
     with col_in_df:
-        st.markdown(f"**{t.get('F_MAIN', 'Función $f(x)$:')}**")
-        f_str_df = st.text_input("f(x)_df", value="sin(x) + x**2", label_visibility="collapsed")
+        st.markdown(f"**{t.get('F_MAIN', 'Función f(x):')}**")
+        f_str_df = st.text_input("f(x)_df", value="sin(x) + x**2", label_visibility="collapsed", key="f_tab3")
         
-        st.markdown(f"**{t.get('DF_X', 'Punto a evaluar $x_i$:')}**")
-        xi = st.number_input("xi", value=1.0, format="%.5f", label_visibility="collapsed")
+        st.markdown(f"**{t.get('DF_X', 'Punto a evaluar xᵢ:')}**")
+        xi = st.number_input("xᵢ", value=1.0, format="%.5f", label_visibility="collapsed", key="xi_tab3")
         
-        st.markdown(f"**{t.get('DF_H', 'Tamaño de paso $h$:')}**")
-        h = st.number_input("h", value=0.1, format="%.5f", label_visibility="collapsed")
+        st.markdown(f"**{t.get('DF_H', 'Tamaño de paso h:')}**")
+        h = st.number_input("h_paso", value=0.1, format="%.5f", label_visibility="collapsed", key="h_tab3")
         
         st.markdown("<br>", unsafe_allow_html=True)
         ejecutar_df = st.button(t.get('CALC_DF_BTN', 'CALCULAR DERIVADAS'), use_container_width=True)
@@ -1119,7 +1111,7 @@ with tab_derivacion:
                     err_centrada = abs(exact_val - df_centrada)
                     
                     # Mostrar valor exacto analítico
-                    st.info(f"**Valor Exacto (Analítico):** $f'({xi}) = {exact_val:.6f}$")
+                    st.info(f"**Valor Exacto (Analítico):** f'({xi}) = {exact_val:.6f}")
                     
                     # Mostrar métricas de las aproximaciones
                     c1, c2, c3 = st.columns(3)
@@ -1145,7 +1137,7 @@ with tab_derivacion:
                     rango_y = [f_lamb_df(val) for val in rango_x]
                     
                     # Curva principal
-                    fig_df.add_trace(go.Scatter(x=rango_x, y=rango_y, mode='lines', name='Curva $f(x)$', line=dict(color='#1a73e8', width=3)))
+                    fig_df.add_trace(go.Scatter(x=rango_x, y=rango_y, mode='lines', name='Curva f(x)', line=dict(color='#7c6dd9', width=3)))
                     
                     # Línea Tangente Exacta
                     y_tangente = exact_val * (rango_x - xi) + f_xi
@@ -1198,24 +1190,24 @@ with tab_integracion:
     col_in_intg, col_out_intg = st.columns([1, 2], gap="large")
     
     with col_in_intg:
-        st.markdown(f"**{t.get('F_MAIN', 'Función $f(x)$:')}**")
-        f_str_intg = st.text_input("f(x)_intg", value="x**2 * exp(-x)", label_visibility="collapsed")
+        st.markdown(f"**{t.get('F_MAIN', 'Función f(x):')}**")
+        f_str_intg = st.text_input("f(x)_intg", value="x**2 * exp(-x)", label_visibility="collapsed", key="f_tab4")
         
         c_lim1, c_lim2 = st.columns(2)
         with c_lim1:
-            st.markdown(f"**{t.get('INTG_A', 'Límite $a$:')}**")
-            a_intg = st.number_input("a_intg", value=0.0, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('INTG_A', 'Límite a:')}**")
+            a_intg = st.number_input("a_intg", value=0.0, format="%.5f", label_visibility="collapsed", key="a_tab4")
         with c_lim2:
-            st.markdown(f"**{t.get('INTG_B', 'Límite $b$:')}**")
-            b_intg = st.number_input("b_intg", value=3.0, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('INTG_B', 'Límite b:')}**")
+            b_intg = st.number_input("b_intg", value=3.0, format="%.5f", label_visibility="collapsed", key="b_tab4")
             
         n_intg = 1
         # Pedir n solo si no es Trapecio Simple
         if metodo_intg != t.get("TRAP_SIMPLE", "Trapecio Simple"):
-            st.markdown(f"**{t.get('INTG_N', 'Número de intervalos $n$:')}**")
+            st.markdown(f"**{t.get('INTG_N', 'Número de intervalos n:')}**")
             # Si es Simpson, n debe ser al menos 2
             min_n = 2 if metodo_intg == t.get("SIMPSON_METHOD", "Simpson (1/3 y 3/8)") else 1
-            n_intg = st.number_input("n_intg", min_value=min_n, max_value=1000, value=max(5, min_n), step=1, label_visibility="collapsed")
+            n_intg = st.number_input("n_intg", min_value=min_n, max_value=1000, value=max(5, min_n), step=1, label_visibility="collapsed", key="n_tab4")
             
         st.markdown("<br>", unsafe_allow_html=True)
         ejecutar_intg = st.button(t.get('CALC_INTG_BTN', 'CALCULAR ÁREA'), use_container_width=True)
@@ -1296,8 +1288,8 @@ with tab_integracion:
                     rango_y_curva = [f_lamb_intg(val) for val in rango_x_curva]
                     fig_intg.add_trace(go.Scatter(
                         x=rango_x_curva, y=rango_y_curva, 
-                        mode='lines', name='Curva $f(x)$', 
-                        line=dict(color='#1a73e8', width=3)
+                        mode='lines', name='Curva f(x)', 
+                        line=dict(color='#7c6dd9', width=3)
                     ))
                     
                     # Relleno del área aproximada
@@ -1347,24 +1339,24 @@ with tab_edo:
     col_in_edo, col_out_edo = st.columns([1, 2], gap="large")
     
     with col_in_edo:
-        st.markdown(f"**{t.get('ODE_F', "Ecuación $y' = f(x, y)$:")}**")
-        f_str_edo = st.text_input("f(x,y)_edo", value="x + y", label_visibility="collapsed")
+        st.markdown("**" + t.get("ODE_F", "Ecuación y' = f(x, y):") + "**")
+        f_str_edo = st.text_input("f(x,y)_edo", value="x + y", label_visibility="collapsed", key="f_tab5")
         
         c_val1, c_val2 = st.columns(2)
         with c_val1:
-            st.markdown(f"**{t.get('ODE_X0', 'Valor $x_0$:')}**")
-            x0_edo = st.number_input("x0_edo", value=0.0, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('ODE_X0', 'Valor inicial x₀:')}**")
+            x0_edo = st.number_input("x0_edo", value=0.0, format="%.5f", label_visibility="collapsed", key="x0_tab5")
         with c_val2:
-            st.markdown(f"**{t.get('ODE_Y0', 'Condición $y_0$:')}**")
-            y0_edo = st.number_input("y0_edo", value=1.0, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('ODE_Y0', 'Condición inicial y₀:')}**")
+            y0_edo = st.number_input("y0_edo", value=1.0, format="%.5f", label_visibility="collapsed", key="y0_tab5")
             
         c_val3, c_val4 = st.columns(2)
         with c_val3:
-            st.markdown(f"**{t.get('ODE_XF', 'Valor final $x_f$:')}**")
-            xf_edo = st.number_input("xf_edo", value=2.0, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('ODE_XF', 'Valor final x_f:')}**")
+            xf_edo = st.number_input("xf_edo", value=2.0, format="%.5f", label_visibility="collapsed", key="xf_tab5")
         with c_val4:
-            st.markdown(f"**{t.get('ODE_H', 'Tamaño de paso $h$:')}**")
-            h_edo = st.number_input("h_edo", value=0.5, format="%.5f", label_visibility="collapsed")
+            st.markdown(f"**{t.get('ODE_H', 'Tamaño de paso h:')}**")
+            h_edo = st.number_input("h_edo", value=0.5, format="%.5f", label_visibility="collapsed", key="h_tab5")
             
         st.markdown("<br>", unsafe_allow_html=True)
         ejecutar_edo = st.button(t.get('CALC_ODE_BTN', 'RESOLVER EDO'), use_container_width=True)
@@ -1444,12 +1436,12 @@ with tab_edo:
                         x=x_vals, y=y_vals, 
                         mode='lines+markers', 
                         name=f'Solución ({metodo_edo})',
-                        line=dict(color='#1a73e8', width=3),
+                        line=dict(color='#7c6dd9', width=3),
                         marker=dict(size=8, color='#ff4d4d', symbol='circle')
                     ))
                     
                     fig_edo.update_layout(
-                        title=f"Aproximación Numérica: $y' = {f_str_edo}$",
+                        title=f"Aproximación Numérica: y' = {f_str_edo}",
                         xaxis_title="Eje X", yaxis_title="Eje Y",
                         hovermode="x unified", margin=dict(l=20, r=20, t=40, b=20),
                         plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)'
@@ -1481,17 +1473,17 @@ with tab_ayuda:
     
     st.markdown(f"### {t['TAB_EXAMPLES']}")
     st.markdown(f"#### {t['EX_1_TITLE']}")
-    st.markdown("* **$f(x)$:** `x^3 - 2x^2 - 5`")
-    st.markdown("* **$x_l$ / $x_u$:** `2.0` / `3.0`")
-    st.markdown("* **$x_0$:** `2.5`")
+    st.markdown("* **f(x):** `x^3 - 2x^2 - 5`")
+    st.markdown("* **xₗ / xᵤ:** `2.0` / `3.0`")
+    st.markdown("* **x₀:** `2.5`")
     
     st.markdown(f"#### {t['EX_2_TITLE']}")
-    st.markdown("* **$f(x)$:** `exp(-x) - x`")
-    st.markdown("* **$x_l$ / $x_u$:** `0.0` / `1.0`")
-    st.markdown("* **$x_0$:** `0.0`")
+    st.markdown("* **f(x):** `exp(-x) - x`")
+    st.markdown("* **xₗ / xᵤ:** `0.0` / `1.0`")
+    st.markdown("* **x₀:** `0.0`")
 
     st.markdown(f"#### {t['EX_3_TITLE']}")
-    st.markdown("* **$f(x)$:** `x^2 - x - 1`")
-    st.markdown("* **$g(x)$:** `(x + 1)^(1/2)` o `sqrt(x + 1)`")
-    st.markdown("* **$x_l$ / $x_u$:** `1.0` / `2.0`")
-    st.markdown("* **$x_0$:** `1.0`")
+    st.markdown("* **f(x):** `x^2 - x - 1`")
+    st.markdown("* **g(x):** `(x + 1)^(1/2)` o `sqrt(x + 1)`")
+    st.markdown("* **xₗ / xᵤ:** `1.0` / `2.0`")
+    st.markdown("* **x₀:** `1.0`")
