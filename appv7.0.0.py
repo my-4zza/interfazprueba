@@ -36,7 +36,7 @@ def agregar_fondo_local(ruta_imagen):
     except FileNotFoundError:
         pass
 
-agregar_fondo_local("wallpaper.jpeg")
+agregar_fondo_local("mikurescaled.jpeg")
 
 # ==========================================
 # GESTIÓN DE ACCIONES Y PARÁMETROS DE URL
