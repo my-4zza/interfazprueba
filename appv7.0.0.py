@@ -848,7 +848,7 @@ with tab_raices:
             st.info(t["INFO_START_ROOTS"])
 
 # ==========================================
-SISTEMAS DE ECUACIONES LINEALES
+# SISTEMAS DE ECUACIONES LINEALES
 # ==========================================
 with tab_sistemas:
     st.markdown("### SOLUCIÓN DE SISTEMAS DE ECUACIONES LINEALES")
