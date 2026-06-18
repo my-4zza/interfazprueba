@@ -34,7 +34,7 @@ def agregar_fondo_local(ruta_imagen):
     )
 
 # Llama a la función con el nombre exacto de tu archivo de imagen
-agregar_fondo_local("wallpaper.jpeg")
+agregar_fondo_local("mikurescaled.jpeg")
 
 # ==========================================
 # GESTIÓN DE ACCIONES Y PARÁMETROS DE URL
